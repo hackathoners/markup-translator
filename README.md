@@ -1,4 +1,10 @@
 markup-translator
 =================
 
-Gives the possibility to translate text written in one markup to another.
+Markup translator is a project which will help at least one guy in the world (me - nAndy). We tried to do [a quick poll on Twitter](https://twitter.com/nandy_andy/status/490834844231139328) but only one person replied and his answer didn't help us much :P But we're gratful he found time to respond to our tweet :)
+
+The project was created in a rush and we'd like it to represent PHP developers from Poznań. We're working on it during an event called [phpackaton](http://phpers.github.io/phpackaton/) (unfortunately the page is in Polish only).
+
+Project Kanban Board
+====================
+It's public! And you can find [our board on Trello](https://trello.com/b/8sNZuLlT/phpackaton)
