@@ -3,7 +3,8 @@ language: php
 php:
   - hhvm
 
-composer install
+before_script:
+  - composer install
 
 script: ./vendor/bin/phpunit
 
