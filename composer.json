@@ -1,0 +1,7 @@
+{
+    "name": "wikia/markup-translator",
+    "description": "Syntax agnostic text markup translator",
+    "license": "MIT",
+    "authors": [],
+    "require": {}
+}
