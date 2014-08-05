@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="tests/bootstrap.php" colors="true">
+    <testsuites>
+        <testsuite name="Markup Translator Test Suite">
+            <directory>tests/MarkupTranslator/</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src/MarkupTranslator/</directory>
+        </whitelist>
+    </filter>
+</phpunit>
