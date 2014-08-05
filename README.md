@@ -8,3 +8,7 @@ The project was created in a rush and we'd like it to represent PHP developers f
 Project Kanban Board
 ====================
 It's public! And you can find [our board on Trello](https://trello.com/b/8sNZuLlT/phpackaton)
+
+CI
+==
+We use [Travis](https://travis-ci.org/).
