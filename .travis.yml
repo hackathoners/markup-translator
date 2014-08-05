@@ -1,0 +1,6 @@
+language: php
+
+php:
+  - hhvm
+
+script: ./vendor/bin/phpunit
