@@ -15,7 +15,7 @@ class GithubTest extends \PHPUnit_Framework_TestCase
         return str_replace(array_keys($replace), $replace, $text);
     }
 
-    public function translateProvider() 
+    public function translateProvider()
     {
         return [
             ['test', '<p>test</p>'],
@@ -23,6 +23,12 @@ class GithubTest extends \PHPUnit_Framework_TestCase
             ['----', '<hr/>'],
             ['****', '<hr/>'],
             ['_____', '<hr/>'],
+            ['# H1', '<h1>H1</h1>'],
+            ['## H2', '<h2>H2</h2>'],
+            ['### H3', '<h3>H3</h3>'],
+            ['#### H4', '<h4>H4</h4>'],
+            ['##### H5', '<h5>H5</h5>'],
+            ['###### H6', '<h6>H6</h6>'],
         ];
     }
 
