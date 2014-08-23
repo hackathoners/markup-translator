@@ -8,6 +8,7 @@ abstract class Base extends \XMLWriter
     const NODE_ROOT = 'body';
 
     const NODE_PARAGRAPH = 'p';
+    const NODE_HR = 'hr';
 
     abstract protected function processLine($line);
 
@@ -15,13 +16,6 @@ abstract class Base extends \XMLWriter
         $this->openMemory();
         $this->setIndent(false);
         $this->startDocument('1.0', 'UTF-8');
-    }
-
-    protected function setElement($nodeName, $value)
-    {
-        $this->startElement($nodeName);
-        $this->text($value);
-        $this->endElement();
     }
 
     public function translate($string)

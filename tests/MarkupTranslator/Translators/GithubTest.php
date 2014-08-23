@@ -5,19 +5,38 @@ namespace MarkupTranslator\Translators;
 class GithubTest extends \PHPUnit_Framework_TestCase
 {
 
+    private function cleanXML($text) {
+        $replace = [
+            '<?xml version="1.0" encoding="UTF-8"?>' => '',
+            "\n" => '',
+            '<body>' => '',
+            '</body>' => '',
+        ];
+        return str_replace(array_keys($replace), $replace, $text);
+    }
+
     /**
      * @covers MarkupTranslator\Translators\Github::translate
      */
     public function testTranslate()
     {
-        $testCase = 'test';
-        $expected = '<?xml version="1.0" encoding="UTF-8"?>
-<body><p>test</p></body>
-';
+        $testCases = [
+            [
+                'text' =>  'test',
+                'expected' => '<p>test</p>',
+            ],
+            [
+                'text' => '---',
+                'expected' => '<hr/>',
+            ]
+        ];
         $translator = new Github();
-        $this->assertEquals(
-            $expected,
-            $translator->translate($testCase)
-        );
+        foreach ($testCases as $testCase)
+        {
+            $this->assertEquals(
+                $testCase['expected'],
+                $this->cleanXml($translator->translate($testCase['text']))
+            );
+        }
     }
 }
