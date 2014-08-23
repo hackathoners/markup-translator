@@ -1,0 +1,40 @@
+<?php
+
+namespace MarkupTranslator\Translators;
+
+abstract class Base extends \XMLWriter
+{
+
+    const NODE_ROOT = 'body';
+
+    const NODE_PARAGRAPH = 'p';
+
+    abstract protected function processLine($line);
+
+    private function init() {
+        $this->openMemory();
+        $this->setIndent(false);
+        $this->startDocument('1.0', 'UTF-8');
+    }
+
+    protected function setElement($nodeName, $value)
+    {
+        $this->startElement($nodeName);
+        $this->text($value);
+        $this->endElement();
+    }
+
+    public function translate($string)
+    {
+        $this->init();
+        $this->startElement(self::NODE_ROOT);
+        $lines = explode("\n", $string);
+        foreach($lines as $line)
+        {
+            $this->processLine(trim($line));
+        }
+        $this->endElement();
+        $this->endDocument();
+        return $this->outputMemory();
+    }
+}
