@@ -5,11 +5,11 @@ namespace MarkupTranslator\Translators;
 class Github extends Base
 {
 
-    
+
 
     protected function processLine($line)
     {
-        if (in_array($line, ['---', '***', '___'])) 
+        if (in_array(substr($line, 0, 3), ['---', '***', '___']))
         {
             return $this->addHorizontalRule();
         }
@@ -21,9 +21,9 @@ class Github extends Base
     {
         return $this->writeElement(self::NODE_PARAGRAPH, $string);
     }
-    
+
     protected function addHorizontalRule()
     {
-        return $this->writeElement(self::NODE_HR);    
+        return $this->writeElement(self::NODE_HR);
     }
 }

@@ -15,28 +15,27 @@ class GithubTest extends \PHPUnit_Framework_TestCase
         return str_replace(array_keys($replace), $replace, $text);
     }
 
+    public function translateProvider() 
+    {
+        return [
+            ['test', '<p>test</p>'],
+            ['---', '<hr/>'],
+            ['----', '<hr/>'],
+            ['****', '<hr/>'],
+            ['_____', '<hr/>'],
+        ];
+    }
+
     /**
      * @covers MarkupTranslator\Translators\Github::translate
+     * @dataProvider translateProvider
      */
-    public function testTranslate()
+    public function testTranslate($text, $expected)
     {
-        $testCases = [
-            [
-                'text' =>  'test',
-                'expected' => '<p>test</p>',
-            ],
-            [
-                'text' => '---',
-                'expected' => '<hr/>',
-            ]
-        ];
         $translator = new Github();
-        foreach ($testCases as $testCase)
-        {
-            $this->assertEquals(
-                $testCase['expected'],
-                $this->cleanXml($translator->translate($testCase['text']))
-            );
-        }
+        $this->assertEquals(
+            $expected,
+            $this->cleanXml($translator->translate($text))
+        );
     }
 }
