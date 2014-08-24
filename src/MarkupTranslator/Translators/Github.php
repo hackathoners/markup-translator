@@ -19,6 +19,13 @@ class Github extends Base
         $this->addParagraph($line);
     }
 
+    protected function processInline($line)
+    {
+        $replaces = [
+            '/\*{1}([^*])\*{1}/' => self::NODE_EM + '$1' + self::NODE_EM
+        ];
+        return preg_replace(array_keys($replaces), $replaces, $line);
+    }
 
     protected function addParagraph($text)
     {
