@@ -7,8 +7,12 @@ class Github extends Base
 
     const MATCH_HEADING = '/([#]{1,6})\s+([^$]+)/';
 
-    protected function processLine($line)
+    protected function processDocument($string)
     {
+        //while ($string) {
+            $string = $this->processParagraph($string);
+        //}
+        /*
         if (in_array(substr($line, 0, 3), ['---', '***', '___']))
         {
             return $this->addHorizontalRule();
@@ -17,6 +21,22 @@ class Github extends Base
             return $this->addHeading(strlen($m[1]), $m[2]);
         }
         $this->addParagraph($line);
+        */
+    }
+
+    private function processParagraph($string) {
+        $this->startElement(self::NODE_PARAGRAPH);
+
+        $end = $this->lookAhead($string, "\n\n") + 1;
+        if ($end === FALSE)
+        {
+            $end = mb_strlen($string);
+        }
+        // FIXME: search for elements here
+        $this->text(mb_substr($string, 0, $end));
+
+        $this->endElement();
+        return trim(mb_substr($string, $end));
     }
 
     protected function processInline($line)
