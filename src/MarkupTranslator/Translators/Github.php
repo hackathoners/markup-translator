@@ -9,9 +9,9 @@ class Github extends Base
 
     protected function processDocument($string)
     {
-        //while ($string) {
+        while ($string) {
             $string = $this->processParagraph($string);
-        //}
+        }
         /*
         if (in_array(substr($line, 0, 3), ['---', '***', '___']))
         {
@@ -27,7 +27,7 @@ class Github extends Base
     private function processParagraph($string) {
         $this->startElement(self::NODE_PARAGRAPH);
 
-        $end = $this->lookAhead($string, "\n\n") + 1;
+        $end = $this->lookAhead($string, "\n\n");
         if ($end === FALSE)
         {
             $end = mb_strlen($string);
