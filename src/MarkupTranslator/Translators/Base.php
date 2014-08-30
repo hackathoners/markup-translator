@@ -9,6 +9,7 @@ abstract class Base extends \XMLWriter
 
     const NODE_PARAGRAPH = 'p';
     const NODE_HR = 'hr';
+    const NODE_BR = 'br';
 
     const NODE_H1 = 'h1';
     const NODE_H2 = 'h2';

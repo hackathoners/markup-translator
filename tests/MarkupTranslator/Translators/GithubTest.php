@@ -21,8 +21,8 @@ class GithubTest extends \PHPUnit_Framework_TestCase
         return [
             ['test', '<p>test</p>'],
             ["test1\n\ntest2", '<p>test1</p><p>test2</p>'],
-/*
             ["test1\ntest2", '<p>test1<br/>test2</p>'],
+/*
             ['> test', '<p><blockquote>test</blockquote></p>'],
             ['*This text will be italic*', '<p><em>This text will be italic</em></p>'],
             ['**This text will be bold**', '<p><strong>This text will be bold</strong></p>'],

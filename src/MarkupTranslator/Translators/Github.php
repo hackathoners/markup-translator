@@ -5,12 +5,14 @@ namespace MarkupTranslator\Translators;
 class Github extends Base
 {
 
+    const BLOCKQUOTE_START = '> ';
     const MATCH_HEADING = '/([#]{1,6})\s+([^$]+)/';
 
-    protected function processDocument($string)
+    protected function processDocument($text)
     {
-        while ($string) {
-            $string = $this->processParagraph($string);
+        while ($text)
+        {
+            $text = $this->processBlock($text);
         }
         /*
         if (in_array(substr($line, 0, 3), ['---', '***', '___']))
@@ -24,37 +26,46 @@ class Github extends Base
         */
     }
 
-    private function processParagraph($string) {
+    private function processBlock($text)
+    {
+        if (mb_substr($text, 0, 2) === self::BLOCKQUOTE_START)
+        {
+            return $this->processBlockquote($text);
+        }
         $this->startElement(self::NODE_PARAGRAPH);
 
-        $end = $this->lookAhead($string, "\n\n");
+        $end = $this->lookAhead($text, "\n\n");
         if ($end === FALSE)
         {
-            $end = mb_strlen($string);
+            $end = mb_strlen($text);
         }
-        // FIXME: search for elements here
-        $this->text(mb_substr($string, 0, $end));
-
+        $this->processInline(mb_substr($text, 0, $end));
         $this->endElement();
-        return trim(mb_substr($string, $end));
+        return trim(mb_substr($text, $end));
     }
 
-    protected function processInline($line)
+    private function processBlockquote($text)
     {
-        $replaces = [
-            '/\*{1}([^*])\*{1}/' => self::NODE_EM + '$1' + self::NODE_EM
-        ];
-        return preg_replace(array_keys($replaces), $replaces, $line);
+
     }
 
-    protected function addParagraph($text)
+    protected function processInline($text)
     {
-        return $this->writeElement(self::NODE_PARAGRAPH, $text);
-    }
-
-    protected function addHorizontalRule()
-    {
-        return $this->writeElement(self::NODE_HR);
+        while ($text)
+        {
+            $end = $this->lookAhead($text, "\n");
+            if ($end === false)
+            {
+                $end = mb_strlen($text);
+            }
+            $this->text(mb_substr($text, 0, $end));
+            $text = trim(mb_substr($text, $end));
+            if ($text)
+            {
+                // Add BR if text is not over
+                $this->writeElement(self::NODE_BR);
+            }
+        }
     }
 
     protected function addHeading($level, $text) {
