@@ -65,6 +65,7 @@ class Github extends Base
                 $this->writeElement(self::NODE_BR);
             }
         };
+        return true;
     }
 
     private function processBlockquote($text)
@@ -77,11 +78,10 @@ class Github extends Base
 
             $this->processInline($text);
 
-            $this->endElement();
             $this->stateMachine['inBlockQuote'] = false;
-        } else {
-            $this->processInline($text);
+            return $this->endElement();
         }
+        return $this->processInline($text);
     }
 
     protected function addHeading($level, $text) {
