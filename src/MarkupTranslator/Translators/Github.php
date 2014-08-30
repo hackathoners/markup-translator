@@ -6,10 +6,12 @@ class Github extends Base
 {
 
     const BLOCKQUOTE_START = '> ';
+    const EMPHASIZED_START_END = '*';
     const MATCH_HEADING = '/([#]{1,6})\s+([^$]+)/';
 
     protected $stateMachine = [
-        'inBlockQuote' => false
+        'inBlockQuote' => false,
+        'inEmphasized' => false,
     ];
 
     protected function processDocument($text)
@@ -52,6 +54,10 @@ class Github extends Base
             {
                 return $this->processBlockquote($text);
             }
+            if (mb_substr($text, 0, 1) === self::EMPHASIZED_START_END)
+            {
+                return $this->processEmphasized($text);
+            }
             $end = $this->lookAhead($text, "\n");
             if ($end === false)
             {
@@ -66,6 +72,25 @@ class Github extends Base
             }
         };
         return true;
+    }
+
+    private function processEmphasized($text)
+    {
+        $text = mb_substr($text, mb_strlen(self::EMPHASIZED_START_END));
+        if(!$this->stateMachine['inEmphasized'])
+        {
+            $this->startElement(self::NODE_EMPHASIZED);
+            $this->stateMachine['inEmphasized'] = true;
+
+            $isClosingInLine = $this->lookAhead($text, self::EMPHASIZED_START_END);
+            $text = mb_substr($text, 0, $isClosingInLine);
+
+            $this->processInline($text);
+
+            $this->stateMachine['inEmphasized'] = false;
+            return $this->endElement();
+        }
+        return $this->processInline($text);
     }
 
     private function processBlockquote($text)
