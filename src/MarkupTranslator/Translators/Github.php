@@ -8,6 +8,10 @@ class Github extends Base
     const BLOCKQUOTE_START = '> ';
     const MATCH_HEADING = '/([#]{1,6})\s+([^$]+)/';
 
+    protected $stateMachine = [
+        'inBlockQuote' => false
+    ];
+
     protected function processDocument($text)
     {
         while ($text)
@@ -28,10 +32,6 @@ class Github extends Base
 
     private function processBlock($text)
     {
-        if (mb_substr($text, 0, 2) === self::BLOCKQUOTE_START)
-        {
-            return $this->processBlockquote($text);
-        }
         $this->startElement(self::NODE_PARAGRAPH);
 
         $end = $this->lookAhead($text, "\n\n");
@@ -44,15 +44,14 @@ class Github extends Base
         return trim(mb_substr($text, $end));
     }
 
-    private function processBlockquote($text)
-    {
-
-    }
-
     protected function processInline($text)
     {
         while ($text)
         {
+            if (mb_substr($text, 0, 2) === self::BLOCKQUOTE_START)
+            {
+                return $this->processBlockquote($text);
+            }
             $end = $this->lookAhead($text, "\n");
             if ($end === false)
             {
@@ -65,7 +64,24 @@ class Github extends Base
                 // Add BR if text is not over
                 $this->writeElement(self::NODE_BR);
             }
+        };
+        return true;
+    }
+
+    private function processBlockquote($text)
+    {
+        $text = mb_substr($text, mb_strlen(self::BLOCKQUOTE_START));
+        if(!$this->stateMachine['inBlockQuote'])
+        {
+            $this->startElement(self::NODE_BLOCKQUOTE);
+            $this->stateMachine['inBlockQuote'] = true;
+
+            $this->processInline($text);
+
+            $this->stateMachine['inBlockQuote'] = false;
+            return $this->endElement();
         }
+        return $this->processInline($text);
     }
 
     protected function addHeading($level, $text) {
