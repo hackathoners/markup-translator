@@ -6,10 +6,12 @@ class Github extends Base
 {
 
     const BLOCKQUOTE_START = '> ';
+    const STRONG_START_END = '**';
     const MATCH_HEADING = '/([#]{1,6})\s+([^$]+)/';
 
     protected $stateMachine = [
-        'inBlockQuote' => false
+        'inBlockQuote' => false,
+        'inStrong' => false,
     ];
 
     protected function processDocument($text)
@@ -52,6 +54,10 @@ class Github extends Base
             {
                 return $this->processBlockquote($text);
             }
+            if (mb_substr($text, 0, 2) === self::STRONG_START_END)
+            {
+                return $this->processStrong($text);
+            }
             $end = $this->lookAhead($text, "\n");
             if ($end === false)
             {
@@ -81,6 +87,26 @@ class Github extends Base
             $this->stateMachine['inBlockQuote'] = false;
             return $this->endElement();
         }
+        return $this->processInline($text);
+    }
+
+    private function processStrong($text)
+    {
+        $text = mb_substr($text, mb_strlen(self::STRONG_START_END));
+
+        if(!$this->stateMachine['inStrong']) {
+            $this->startElement(self::NODE_STRONG);
+            $this->stateMachine['inStrong'] = true;
+
+            $isClosingInLine = $this->lookAhead($text, self::STRONG_START_END);
+            $text = mb_substr($text, 0, $isClosingInLine);
+
+            $this->processInline($text);
+
+            $this->stateMachine['inStrong'] = false;
+            return $this->endElement();
+        }
+
         return $this->processInline($text);
     }
 
