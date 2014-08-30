@@ -8,7 +8,7 @@ class Github extends Base
     const BLOCKQUOTE_START = '> ';
     const MATCH_HEADING = '/([#]{1,6})\s+([^$]+)/';
 
-    var $sm = [
+    protected $stateMachine = [
         'inBlockQuote' => false
     ];
 
@@ -70,15 +70,15 @@ class Github extends Base
     private function processBlockquote($text)
     {
         $text = mb_substr($text, mb_strlen(self::BLOCKQUOTE_START));
-        if(!$this->sm['inBlockQuote'])
+        if(!$this->stateMachine['inBlockQuote'])
         {
             $this->startElement(self::NODE_BLOCKQUOTE);
-            $this->sm['inBlockQuote'] = true;
+            $this->stateMachine['inBlockQuote'] = true;
 
             $this->processInline($text);
 
             $this->endElement();
-            $this->sm['inBlockQuote'] = false;
+            $this->stateMachine['inBlockQuote'] = false;
         } else {
             $this->processInline($text);
         }
