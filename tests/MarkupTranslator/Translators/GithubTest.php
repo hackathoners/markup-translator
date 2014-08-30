@@ -26,8 +26,9 @@ class GithubTest extends \PHPUnit_Framework_TestCase
             ["> test1\n> test2", '<p><blockquote>test1<br/>test2</blockquote></p>'],
             ['*This text will be italic*', '<p><em>This text will be italic</em></p>'],
             ['**This text will be bold**', '<p><strong>This text will be bold</strong></p>'],
+            ['**Everyone *must* attend the meeting at 5 today.**', '<p><strong>Everyone <em>must</em> attend the meeting at 5 clock today.</strong></p>'],
 /*
-            ['**Everyone _must_ attend the meeting at 5 today.**', '<p><strong>Everyone <em>must</em> attend the meeting at 5 clock today.</strong</p>'],
+            ['**Everyone _must_ attend the meeting at 5 today.**', '<p><strong>Everyone <em>must</em> attend the meeting at 5 clock today.</strong></p>'],
             ['---', '<hr/>'],
             ['----', '<hr/>'],
             ['****', '<hr/>'],
