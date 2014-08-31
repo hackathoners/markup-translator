@@ -30,9 +30,9 @@ class GithubTest extends \PHPUnit_Framework_TestCase
             ['This text will not be bold. **But this will be.**', '<p>This text will not be bold. <strong>But this will be.</strong></p>'],
             ['This text will not be emphasized. *But this will be.* And this again not emphasized.', '<p>This text will not be emphasized. <em>But this will be.</em> And this again not emphasized.</p>'],
             ['This text will not be bold. **But this will be.** And this again without bold.', '<p>This text will not be bold. <strong>But this will be.</strong> And this again without bold.</p>'],
+            ['**Everyone *must* attend the meeting at 5 today.**', '<p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p>'],
 /*
-            ['**Everyone *must* attend the meeting at 5 today.**', '<p><strong>Everyone <em>must</em> attend the meeting at 5 clock today.</strong></p>'],
-            ['**Everyone _must_ attend the meeting at 5 today.**', '<p><strong>Everyone <em>must</em> attend the meeting at 5 clock today.</strong></p>'],
+            ['**Everyone _must_ attend the meeting at 5 today.**', '<p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p>'],
             ['---', '<hr/>'],
             ['----', '<hr/>'],
             ['****', '<hr/>'],

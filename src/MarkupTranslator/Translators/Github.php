@@ -57,20 +57,33 @@ class Github extends Base
                 return $this->processBlockquote($text);
             }
 
-            $formattedTextAhead = $this->lookAhead($text, self::STRONG_START_END);
-            if( $formattedTextAhead !== false ) {
-                $unformattedText = mb_substr($text, 0, $formattedTextAhead);
-                $formattedTextAhead = mb_substr($text, $formattedTextAhead);
-                $this->text($unformattedText);
-                return $this->processStrong($formattedTextAhead);
-            }
+            $importantTextAhead = $this->lookAhead($text, self::STRONG_START_END);
+            $emphasizedTextAhead = $this->lookAhead($text, self::EMPHASIZED_START_END);
 
-            $formattedTextAhead = $this->lookAhead($text, self::EMPHASIZED_START_END);
-            if( $formattedTextAhead !== false ) {
-                $unformattedText = mb_substr($text, 0, $formattedTextAhead);
-                $formattedTextAhead = mb_substr($text, $formattedTextAhead);
+            if($importantTextAhead !== false && $emphasizedTextAhead !== false)
+            {
+                if($importantTextAhead <= $emphasizedTextAhead)
+                {
+                    $unformattedText = mb_substr($text, 0, $importantTextAhead);
+                    $importantText = mb_substr($text, $importantTextAhead);
+                    $this->text($unformattedText);
+                    return $this->processStrong($importantText);
+                } else {
+                    $unformattedText = mb_substr($text, 0, $emphasizedTextAhead);
+                    $emphasizedText = mb_substr($text, $emphasizedTextAhead);
+                    $this->text($unformattedText);
+                    return $this->processEmphasized($emphasizedText);
+                }
+            } else if( $importantTextAhead !== false ) {
+                $unformattedText = mb_substr($text, 0, $importantTextAhead);
+                $importantText = mb_substr($text, $importantTextAhead);
                 $this->text($unformattedText);
-                return $this->processEmphasized($formattedTextAhead);
+                return $this->processStrong($importantText);
+            } else if( $emphasizedTextAhead !== false ) {
+                $unformattedText = mb_substr($text, 0, $emphasizedTextAhead);
+                $emphasizedText = mb_substr($text, $emphasizedTextAhead);
+                $this->text($unformattedText);
+                return $this->processEmphasized($emphasizedText);
             }
 
             $end = $this->lookAhead($text, "\n");
