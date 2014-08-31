@@ -56,14 +56,23 @@ class Github extends Base
             {
                 return $this->processBlockquote($text);
             }
-            if (mb_substr($text, 0, 2) === self::STRONG_START_END)
-            {
-                return $this->processStrong($text);
+
+            $formattedTextAhead = $this->lookAhead($text, self::STRONG_START_END);
+            if( $formattedTextAhead !== false ) {
+                $unformattedText = mb_substr($text, 0, $formattedTextAhead);
+                $formattedTextAhead = mb_substr($text, $formattedTextAhead);
+                $this->text($unformattedText);
+                return $this->processStrong($formattedTextAhead);
             }
-            if (mb_substr($text, 0, 1) === self::EMPHASIZED_START_END)
-            {
-                return $this->processEmphasized($text);
+
+            $formattedTextAhead = $this->lookAhead($text, self::EMPHASIZED_START_END);
+            if( $formattedTextAhead !== false ) {
+                $unformattedText = mb_substr($text, 0, $formattedTextAhead);
+                $formattedTextAhead = mb_substr($text, $formattedTextAhead);
+                $this->text($unformattedText);
+                return $this->processEmphasized($formattedTextAhead);
             }
+
             $end = $this->lookAhead($text, "\n");
             if ($end === false)
             {
@@ -83,19 +92,16 @@ class Github extends Base
     private function processEmphasized($text)
     {
         $text = mb_substr($text, mb_strlen(self::EMPHASIZED_START_END));
+
         if(!$this->stateMachine['inEmphasized'])
         {
             $this->startElement(self::NODE_EMPHASIZED);
             $this->stateMachine['inEmphasized'] = true;
-
-            $isClosingInLine = $this->lookAhead($text, self::EMPHASIZED_START_END);
-            $text = mb_substr($text, 0, $isClosingInLine);
-
-            $this->processInline($text);
-
+        } else {
             $this->stateMachine['inEmphasized'] = false;
-            return $this->endElement();
+            $this->endElement();
         }
+
         return $this->processInline($text);
     }
 
@@ -119,17 +125,13 @@ class Github extends Base
     {
         $text = mb_substr($text, mb_strlen(self::STRONG_START_END));
 
-        if(!$this->stateMachine['inStrong']) {
+        if(!$this->stateMachine['inStrong'])
+        {
             $this->startElement(self::NODE_STRONG);
             $this->stateMachine['inStrong'] = true;
-
-            $isClosingInLine = $this->lookAhead($text, self::STRONG_START_END);
-            $text = mb_substr($text, 0, $isClosingInLine);
-
-            $this->processInline($text);
-
+        } else {
             $this->stateMachine['inStrong'] = false;
-            return $this->endElement();
+            $this->endElement();
         }
 
         return $this->processInline($text);
