@@ -8,6 +8,8 @@ class Github extends Base
     const BLOCKQUOTE_START = '> ';
     const EMPHASIZED_START_END = '*';
     const STRONG_START_END = '**';
+    const EMPHASIZED_START_END_TYPE_2 = '_';
+    const STRONG_START_END_TYPE_2 = '__';
     const MATCH_HEADING = '/([#]{1,6})\s+([^$]+)/';
 
     protected $stateMachine = [
@@ -60,6 +62,16 @@ class Github extends Base
             $importantTextAhead = $this->lookAhead($text, self::STRONG_START_END);
             $emphasizedTextAhead = $this->lookAhead($text, self::EMPHASIZED_START_END);
 
+            if($importantTextAhead === false)
+            {
+                $importantTextAhead = $this->lookAhead($text, self::STRONG_START_END_TYPE_2);
+            }
+
+            if($emphasizedTextAhead === false)
+            {
+                $emphasizedTextAhead = $this->lookAhead($text, self::EMPHASIZED_START_END_TYPE_2);
+            }
+            
             if($importantTextAhead !== false && $emphasizedTextAhead !== false)
             {
                 if($importantTextAhead <= $emphasizedTextAhead)

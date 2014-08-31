@@ -31,6 +31,13 @@ class GithubTest extends \PHPUnit_Framework_TestCase
             ['This text will not be emphasized. *But this will be.* And this again not emphasized.', '<p>This text will not be emphasized. <em>But this will be.</em> And this again not emphasized.</p>'],
             ['This text will not be bold. **But this will be.** And this again without bold.', '<p>This text will not be bold. <strong>But this will be.</strong> And this again without bold.</p>'],
             ['**Everyone *must* attend the meeting at 5 today.**', '<p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p>'],
+            ['_This text will be emphasized_', '<p><em>This text will be emphasized</em></p>'],
+            ['__This text will be bold__', '<p><strong>This text will be bold</strong></p>'],
+            ['This text will not be emphasized. _But this will be._', '<p>This text will not be emphasized. <em>But this will be.</em></p>'],
+            ['This text will not be bold. __But this will be.__', '<p>This text will not be bold. <strong>But this will be.</strong></p>'],
+            ['This text will not be emphasized. _But this will be._ And this again not emphasized.', '<p>This text will not be emphasized. <em>But this will be.</em> And this again not emphasized.</p>'],
+            ['This text will not be bold. __But this will be.__ And this again without bold.', '<p>This text will not be bold. <strong>But this will be.</strong> And this again without bold.</p>'],
+            ['__Everyone _must_ attend the meeting at 5 today.__', '<p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p>'],
 /*
             ['**Everyone _must_ attend the meeting at 5 today.**', '<p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p>'],
             ['---', '<hr/>'],
