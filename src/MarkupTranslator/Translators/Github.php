@@ -71,7 +71,7 @@ class Github extends Base
             {
                 $emphasizedTextAhead = $this->lookAhead($text, self::EMPHASIZED_START_END_TYPE_2);
             }
-            
+
             if($importantTextAhead !== false && $emphasizedTextAhead !== false)
             {
                 if($importantTextAhead <= $emphasizedTextAhead)
@@ -80,18 +80,24 @@ class Github extends Base
                     $importantText = mb_substr($text, $importantTextAhead);
                     $this->text($unformattedText);
                     return $this->processStrong($importantText);
-                } else {
+                }
+                else
+                {
                     $unformattedText = mb_substr($text, 0, $emphasizedTextAhead);
                     $emphasizedText = mb_substr($text, $emphasizedTextAhead);
                     $this->text($unformattedText);
                     return $this->processEmphasized($emphasizedText);
                 }
-            } else if( $importantTextAhead !== false ) {
+            }
+            else if($importantTextAhead !== false)
+            {
                 $unformattedText = mb_substr($text, 0, $importantTextAhead);
                 $importantText = mb_substr($text, $importantTextAhead);
                 $this->text($unformattedText);
                 return $this->processStrong($importantText);
-            } else if( $emphasizedTextAhead !== false ) {
+            }
+            else if($emphasizedTextAhead !== false)
+            {
                 $unformattedText = mb_substr($text, 0, $emphasizedTextAhead);
                 $emphasizedText = mb_substr($text, $emphasizedTextAhead);
                 $this->text($unformattedText);
