@@ -6,10 +6,16 @@ class Github extends Base
 {
 
     const BLOCKQUOTE_START = '> ';
+    const EMPHASIZED_START_END = '*';
+    const STRONG_START_END = '**';
+    const EMPHASIZED_START_END_TYPE_2 = '_';
+    const STRONG_START_END_TYPE_2 = '__';
     const MATCH_HEADING = '/([#]{1,6})\s+([^$]+)/';
 
     protected $stateMachine = [
-        'inBlockQuote' => false
+        'inBlockQuote' => false,
+        'inEmphasized' => false,
+        'inStrong' => false,
     ];
 
     protected function processDocument($text)
@@ -52,6 +58,52 @@ class Github extends Base
             {
                 return $this->processBlockquote($text);
             }
+
+            $importantTextAhead = $this->lookAhead($text, self::STRONG_START_END);
+            $emphasizedTextAhead = $this->lookAhead($text, self::EMPHASIZED_START_END);
+
+            if($importantTextAhead === false)
+            {
+                $importantTextAhead = $this->lookAhead($text, self::STRONG_START_END_TYPE_2);
+            }
+
+            if($emphasizedTextAhead === false)
+            {
+                $emphasizedTextAhead = $this->lookAhead($text, self::EMPHASIZED_START_END_TYPE_2);
+            }
+
+            if($importantTextAhead !== false && $emphasizedTextAhead !== false)
+            {
+                if($importantTextAhead <= $emphasizedTextAhead)
+                {
+                    $unformattedText = mb_substr($text, 0, $importantTextAhead);
+                    $importantText = mb_substr($text, $importantTextAhead);
+                    $this->text($unformattedText);
+                    return $this->processStrong($importantText);
+                }
+                else
+                {
+                    $unformattedText = mb_substr($text, 0, $emphasizedTextAhead);
+                    $emphasizedText = mb_substr($text, $emphasizedTextAhead);
+                    $this->text($unformattedText);
+                    return $this->processEmphasized($emphasizedText);
+                }
+            }
+            else if($importantTextAhead !== false)
+            {
+                $unformattedText = mb_substr($text, 0, $importantTextAhead);
+                $importantText = mb_substr($text, $importantTextAhead);
+                $this->text($unformattedText);
+                return $this->processStrong($importantText);
+            }
+            else if($emphasizedTextAhead !== false)
+            {
+                $unformattedText = mb_substr($text, 0, $emphasizedTextAhead);
+                $emphasizedText = mb_substr($text, $emphasizedTextAhead);
+                $this->text($unformattedText);
+                return $this->processEmphasized($emphasizedText);
+            }
+
             $end = $this->lookAhead($text, "\n");
             if ($end === false)
             {
@@ -68,6 +120,22 @@ class Github extends Base
         return true;
     }
 
+    private function processEmphasized($text)
+    {
+        $text = mb_substr($text, mb_strlen(self::EMPHASIZED_START_END));
+
+        if(!$this->stateMachine['inEmphasized'])
+        {
+            $this->startElement(self::NODE_EMPHASIZED);
+            $this->stateMachine['inEmphasized'] = true;
+        } else {
+            $this->stateMachine['inEmphasized'] = false;
+            $this->endElement();
+        }
+
+        return $this->processInline($text);
+    }
+
     private function processBlockquote($text)
     {
         $text = mb_substr($text, mb_strlen(self::BLOCKQUOTE_START));
@@ -81,6 +149,22 @@ class Github extends Base
             $this->stateMachine['inBlockQuote'] = false;
             return $this->endElement();
         }
+        return $this->processInline($text);
+    }
+
+    private function processStrong($text)
+    {
+        $text = mb_substr($text, mb_strlen(self::STRONG_START_END));
+
+        if(!$this->stateMachine['inStrong'])
+        {
+            $this->startElement(self::NODE_STRONG);
+            $this->stateMachine['inStrong'] = true;
+        } else {
+            $this->stateMachine['inStrong'] = false;
+            $this->endElement();
+        }
+
         return $this->processInline($text);
     }
 
