@@ -38,6 +38,12 @@ class Github extends Base
 
     private function processBlock($text)
     {
+        if (preg_match(self::MATCH_HEADING, $text, $m))
+        {
+            $this->addHeading(strlen($m[1]), $m[2]);
+            return '';
+        }
+
         $this->startElement(self::NODE_PARAGRAPH);
 
         $end = $this->lookAhead($text, "\n\n");
@@ -45,7 +51,7 @@ class Github extends Base
         {
             $end = mb_strlen($text);
         }
-        $this->processInline(mb_substr($text, 0, $end));
+        $this->processInLine(mb_substr($text, 0, $end));
         $this->endElement();
         return trim(mb_substr($text, $end));
     }
@@ -181,6 +187,8 @@ class Github extends Base
         if (isset($types[$level])) {
             $nodeType = $types[$level];
         };
-        return $this->writeElement($nodeType, $text);
+        $this->startElement($nodeType);
+        $this->processInline($text);
+        return $this->endElement();
     }
 }
