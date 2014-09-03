@@ -11,6 +11,7 @@ class Github extends Base
     const EMPHASIZED_START_END_TYPE_2 = '_';
     const STRONG_START_END_TYPE_2 = '__';
     const MATCH_HEADING = '/([#]{1,6})\s+([^$]+)/';
+    const MATCH_LINK = '/(.+)\[([^\]]+)\]\(([^\)]+)\)(.+)/';
 
     protected $stateMachine = [
         'inBlockQuote' => false,
@@ -63,6 +64,11 @@ class Github extends Base
             if (mb_substr($text, 0, 2) === self::BLOCKQUOTE_START)
             {
                 return $this->processBlockquote($text);
+            }
+
+            if (preg_match(self::MATCH_LINK, $text, $m))
+            {
+                return $this->processLink($m[1], $m[2], $m[3], $m[4]);
             }
 
             $importantTextAhead = $this->lookAhead($text, self::STRONG_START_END);
@@ -156,6 +162,17 @@ class Github extends Base
             return $this->endElement();
         }
         return $this->processInline($text);
+    }
+
+    private function processLink($before, $text, $link, $after)
+    {
+        $this->text($before);
+        $this->startElement(self::NODE_A);
+        $this->writeAttribute(self::ATTR_HREF, $link);
+        $this->text($text);
+        $this->endElement();
+        $this->text($after);
+        return true;
     }
 
     private function processStrong($text)
