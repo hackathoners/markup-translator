@@ -199,7 +199,7 @@ class Github extends Base
     }
 
     protected function addHorizontalRule() {
-        $this->startElement('hr');
+        $this->startElement(self::NODE_HR);
         return $this->endElement();
     }
 }
