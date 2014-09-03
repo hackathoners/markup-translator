@@ -166,9 +166,24 @@ class Github extends Base
 
     private function processLink($before, $text, $link, $after)
     {
+        $title = '';
+
+        if (preg_match('/\"(.+)\"/', $link, $m))
+        {
+            $title = trim($m[1]);
+        }
+
+        $link = trim(preg_replace('/\"(.+)\"/', '', $link));
+
         $this->text($before);
         $this->startElement(self::NODE_A);
         $this->writeAttribute(self::ATTR_HREF, $link);
+
+        if (!empty($title))
+        {
+            $this->writeAttribute(self::ATTR_TITLE, $title);
+        }
+
         $this->text($text);
         $this->endElement();
         $this->text($after);

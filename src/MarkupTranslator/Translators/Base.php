@@ -23,6 +23,7 @@ abstract class Base extends \XMLWriter
     const NODE_H6 = 'h6';
 
     const ATTR_HREF = 'href';
+    const ATTR_TITLE = 'title';
 
     abstract protected function processDocument($line);
 
