@@ -11,6 +11,12 @@ class Github extends Base
     const EMPHASIZED_START_END_TYPE_2 = '_';
     const STRONG_START_END_TYPE_2 = '__';
     const MATCH_HEADING = '/([#]{1,6})\s+([^$]+)/';
+    const MATCH_HR_PATTERN = '/[\%s]{3,}|[\%s ]{5,}/';
+
+    private $hrPatternSigns = [
+        '*',
+        '-',
+    ];
 
     protected $stateMachine = [
         'inBlockQuote' => false,
@@ -24,16 +30,6 @@ class Github extends Base
         {
             $text = $this->processBlock($text);
         }
-        /*
-        if (in_array(substr($line, 0, 3), ['---', '***', '___']))
-        {
-            return $this->addHorizontalRule();
-        }
-        if (preg_match(self::MATCH_HEADING, $line, $m)) {
-            return $this->addHeading(strlen($m[1]), $m[2]);
-        }
-        $this->addParagraph($line);
-        */
     }
 
     private function processBlock($text)
@@ -42,6 +38,16 @@ class Github extends Base
         {
             $this->addHeading(strlen($m[1]), $m[2]);
             return '';
+        }
+
+        foreach ($this->hrPatternSigns as $sign)
+        {
+            $pattern = sprintf(self::MATCH_HR_PATTERN, $sign, $sign);
+            if (preg_match($pattern, $text, $m))
+            {
+                $this->addHorizontalRule();
+                return '';
+            }
         }
 
         $this->startElement(self::NODE_PARAGRAPH);
@@ -189,6 +195,11 @@ class Github extends Base
         };
         $this->startElement($nodeType);
         $this->processInline($text);
+        return $this->endElement();
+    }
+
+    protected function addHorizontalRule() {
+        $this->startElement('hr');
         return $this->endElement();
     }
 }
