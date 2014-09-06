@@ -51,6 +51,8 @@ class GithubTest extends \PHPUnit_Framework_TestCase
             ['#### H4', '<h4>H4</h4>'],
             ['##### H5', '<h5>H5</h5>'],
             ['###### H6', '<h6>H6</h6>'],
+            ['This is an [example link](http://example.com/).', '<p>This is an <a href="http://example.com/">example link</a>.</p>'],
+            ['This is an [example link](http://example.com/ "With a Title").', '<p>This is an <a href="http://example.com/" title="With a Title">example link</a>.</p>'],
         ];
     }
 
