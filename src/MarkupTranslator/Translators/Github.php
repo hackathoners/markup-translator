@@ -25,20 +25,20 @@ class Github extends Base
         'inStrong' => false,
     ];
 
-    protected function processDocument($text)
-    {
-        while ($text)
-        {
-            $text = $this->processBlock($text);
-        }
-    }
 
-    private function processBlock($text)
+    /*
+     * Block elements are:
+     * - paragraph
+     * - heading
+     * - horizontal rule
+     * - blockquote (multiline)
+     * - code (multiline)
+     */
+    protected function processBlock($text)
     {
-        if (preg_match(self::MATCH_HEADING, $text, $m))
+        if (preg_match(self::MATCH_HEADING, $text, $matches))
         {
-            $this->addHeading(strlen($m[1]), $m[2]);
-            return '';
+            return $this->addHeading(strlen($matches[1]), $matches[2]);
         }
 
         foreach ($this->hrPatternSigns as $sign)
@@ -63,6 +63,13 @@ class Github extends Base
         return trim(mb_substr($text, $end));
     }
 
+    /* Inline elements are:
+     * - emphasiezed
+     * - strong
+     * - links
+     * - images
+     * - emoticons
+     */
     protected function processInline($text)
     {
         while ($text)
@@ -135,7 +142,7 @@ class Github extends Base
                 $this->writeElement(self::NODE_BR);
             }
         };
-        return true;
+        return ''; //All text is consumed
     }
 
     private function processEmphasized($text)
@@ -213,21 +220,17 @@ class Github extends Base
     }
 
     protected function addHeading($level, $text) {
-        $nodeType = self::NODE_H6;
-        $types = [
+        $nodeType = [
             1 => self::NODE_H1,
             2 => self::NODE_H2,
             3 => self::NODE_H3,
             4 => self::NODE_H4,
             5 => self::NODE_H5,
             6 => self::NODE_H6,
-        ];
-        if (isset($types[$level])) {
-            $nodeType = $types[$level];
-        };
-        $this->startElement($nodeType);
-        $this->processInline($text);
-        return $this->endElement();
+        ][$level];
+        return $this->wrapInNode($nodeType, function() use ($text){
+            return $this->processInline($text);
+        });
     }
 
     protected function addHorizontalRule() {
