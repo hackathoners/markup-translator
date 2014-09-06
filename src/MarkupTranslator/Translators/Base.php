@@ -63,8 +63,8 @@ abstract class Base extends \XMLWriter
     protected function wrapInNode($nodeType, $callback)
     {
         // Sanity check
-        assert(is_string($nodeType), 'Wraps expects string as first parameter');
-        assert(is_callable($callback), 'Wraps expects callable as second parameter');
+        assert(is_string($nodeType));
+        assert(is_callable($callback));
 
         $this->startElement($nodeType);
         return $callback();
