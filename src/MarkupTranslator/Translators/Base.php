@@ -11,6 +11,7 @@ abstract class Base extends \XMLWriter
     const NODE_BLOCKQUOTE = 'blockquote';
     const NODE_EMPHASIZED = 'em';
     const NODE_STRONG = 'strong';
+    const NODE_A = 'a';
     const NODE_HR = 'hr';
     const NODE_BR = 'br';
 
@@ -20,6 +21,9 @@ abstract class Base extends \XMLWriter
     const NODE_H4 = 'h4';
     const NODE_H5 = 'h5';
     const NODE_H6 = 'h6';
+
+    const ATTR_HREF = 'href';
+    const ATTR_TITLE = 'title';
 
     abstract protected function processDocument($line);
 
