@@ -67,7 +67,8 @@ abstract class Base extends \XMLWriter
         assert(is_callable($callback));
 
         $this->startElement($nodeType);
-        return $callback();
+        $result = $callback();
         $this->endElement();
+        return $result;
     }
 }
