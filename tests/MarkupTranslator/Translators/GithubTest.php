@@ -106,8 +106,8 @@ class GithubTest extends \PHPUnit_Framework_TestCase
             ['<root><p>This text will not be emphasized. <em>But this will be.</em> And this again not emphasized.</p></root>', 'This text will not be emphasized. *But this will be.* And this again not emphasized.'],
             ['<root><p>This text will not be bold. <strong>But this will be.</strong> And this again without bold.</p></root>', 'This text will not be bold. **But this will be.** And this again without bold.'],
             ['<root><p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p></root>', '**Everyone *must* attend the meeting at 5 today.**'],
-            /*
             ['<hr/>', '***'],
+            /*
             ['<h1>H1</h1>', '# H1'],
             ['<h2>H2</h2>', '## H2'],
             ['<h3>H3</h3>', '### H3'],

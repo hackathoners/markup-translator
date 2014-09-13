@@ -286,6 +286,10 @@ class Github extends Base
                 $output .= '**';
             }
 
+            if($xml->name === self::NODE_HR) {
+                $output .= '***';
+            }
+
             if($xml->nodeType === \XMLReader::TEXT) {
                 if($this->stateMachine['inBlockQuote']) {
                     $output .= '> ';
