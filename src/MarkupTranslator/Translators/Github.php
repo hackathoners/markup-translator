@@ -261,52 +261,84 @@ class Github extends Base
     protected function processXml($xml) {
         $output = '';
 
-        while($xml->read()) {
-            if($xml->nodeType === \XMLReader::ELEMENT && $xml->name === self::NODE_PARAGRAPH) {
+        while($xml->read())
+        {
+            if($xml->nodeType === \XMLReader::ELEMENT && $xml->name === self::NODE_PARAGRAPH)
+            {
                 continue;
             }
 
-            if($xml->name === self::NODE_BR) {
+            if($xml->name === self::NODE_BR)
+            {
                 $output .= "\n";
             }
 
-            if($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType !== \XMLReader::END_ELEMENT) {
+            if($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType !== \XMLReader::END_ELEMENT)
+            {
                 $this->stateMachine['inBlockQuote'] = true;
             }
 
-            if($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType === \XMLReader::END_ELEMENT) {
+            if($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType === \XMLReader::END_ELEMENT)
+            {
                 $this->stateMachine['inBlockQuote'] = false;
             }
 
-            if($xml->name === self::NODE_EMPHASIZED) {
+            if($xml->name === self::NODE_EMPHASIZED)
+            {
                 $output .= '*';
             }
 
-            if($xml->name === self::NODE_STRONG) {
+            if($xml->name === self::NODE_STRONG)
+            {
                 $output .= '**';
             }
 
-            if($xml->name === self::NODE_HR) {
+            if($xml->name === self::NODE_HR)
+            {
                 $output .= '***';
             }
 
             if(
                 in_array($xml->name, [self::NODE_H1, self::NODE_H2, self::NODE_H3, self::NODE_H4, self::NODE_H5, self::NODE_H6])
                 && $xml->nodeType !== \XMLReader::END_ELEMENT
-            ) {
+            )
+            {
                 $level = substr($xml->name, 1, 1);
                 $output .= str_repeat('#', $level) . ' ';
             }
 
-            if($xml->nodeType === \XMLReader::TEXT) {
-                if($this->stateMachine['inBlockQuote']) {
+            if($xml->name === self::NODE_A && $xml->nodeType !== \XMLReader::END_ELEMENT)
+            {
+                $output .= '[';
+            }
+
+            if($xml->name === self::NODE_A && $xml->nodeType === \XMLReader::END_ELEMENT)
+            {
+                $href = $xml->getAttribute('href');
+                $title = $xml->getAttribute('title');
+
+                if(empty($title))
+                {
+                    $output .= '](' . $href . ')';
+                }
+                else
+                {
+                    $output .= '](' . $href . ' "' . $title . '")';
+                }
+            }
+
+            if($xml->nodeType === \XMLReader::TEXT)
+            {
+                if($this->stateMachine['inBlockQuote'])
+                {
                     $output .= '> ';
                 }
 
                 $output .= $xml->readString();
             }
 
-            if($xml->nodeType === \XMLReader::END_ELEMENT && $xml->name === self::NODE_PARAGRAPH) {
+            if($xml->nodeType === \XMLReader::END_ELEMENT && $xml->name === self::NODE_PARAGRAPH)
+            {
                 $output .= "\n\n";
             }
         }
