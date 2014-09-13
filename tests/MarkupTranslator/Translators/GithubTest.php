@@ -95,8 +95,16 @@ class GithubTest extends \PHPUnit_Framework_TestCase
     }
 
     public function xmlToTextProvider() {
+        $decoratedTestCases = array_map(function($testCase) {
+            return [
+                '<?xml version="1.0" encoding="UTF-8"?><body>' . $testCase[1] . '</body>',
+                $testCase[0],
+            ];
+        }, $this->testCases);
+
         return [
-            array_reverse($this->testCases[0])
+            $decoratedTestCases[0],
+            $decoratedTestCases[1],
         ];
     }
 }

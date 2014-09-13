@@ -262,15 +262,19 @@ class Github extends Base
         $output = '';
 
         while($xml->read()) {
-            if($xml->nodeType === \XMLReader::ELEMENT) {
-                switch($xml->name) {
-                    case self::NODE_PARAGRAPH:
-                        $output .= $xml->readString();
-                        break;
-                }
+            if($xml->nodeType === \XMLReader::ELEMENT && $xml->name === self::NODE_PARAGRAPH) {
+                continue;
+            }
+
+            if($xml->nodeType === \XMLReader::TEXT ) {
+                $output .= $xml->readString();
+            }
+
+            if($xml->nodeType === \XMLReader::END_ELEMENT && $xml->name === self::NODE_PARAGRAPH) {
+                $output .= "\n\n";
             }
         }
 
-        return $output;
+        return trim($output);
     }
 }
