@@ -232,7 +232,7 @@ class Github extends Base
 
     protected function addHeading($level, $text)
     {
-        $nodeType = [
+        $nodeTypes = [
             1 => self::NODE_H1,
             2 => self::NODE_H2,
             3 => self::NODE_H3,
@@ -240,7 +240,7 @@ class Github extends Base
             5 => self::NODE_H5,
             6 => self::NODE_H6,
         ];
-        $nodeType = $nodeType[$level];
+        $nodeType = $nodeTypes[$level];
 
         return $this->wrapInNode($nodeType, function () use ($text) {
             return $this->processInline($text);
