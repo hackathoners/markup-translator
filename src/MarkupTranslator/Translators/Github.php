@@ -15,16 +15,15 @@ class Github extends Base
     const MATCH_HR = '/^\s*([\-]{3,}|[\*]{3,})|[\- ]{5,}|[\* ]{5,}\s*$/';
     const MATCH_LINK = '/(.+)\[([^\]]+)\]\(([^\)]+)\)(.+)/';
 
-    private $hrPatternSigns = [
-        '*',
-        '-',
-    ];
-
     protected $stateMachine = [
         'inBlockQuote' => false,
         'inEmphasized' => false,
         'inStrong' => false,
     ];
+
+    protected function getMarkupName() {
+        return 'GitHub Markdown';
+    }
 
     /**
      * Block elements are:
@@ -151,7 +150,6 @@ class Github extends Base
 
     private function findBlockquoteEnd($text)
     {
-        $start = 0;
         $end = mb_strlen($text);
         $lastLineStartPos = mb_strrpos($text, "\n> ");
         if ($lastLineStartPos === false) {
@@ -234,14 +232,15 @@ class Github extends Base
 
     protected function addHeading($level, $text)
     {
-        $nodeType = [
+        $nodeTypes = [
             1 => self::NODE_H1,
             2 => self::NODE_H2,
             3 => self::NODE_H3,
             4 => self::NODE_H4,
             5 => self::NODE_H5,
             6 => self::NODE_H6,
-        ][$level];
+        ];
+        $nodeType = $nodeTypes[$level];
 
         return $this->wrapInNode($nodeType, function () use ($text) {
             return $this->processInline($text);
@@ -253,5 +252,104 @@ class Github extends Base
         $this->writeElement(self::NODE_HR);
 
         return ''; // FIXME: return remaining text
+    }
+
+    /**
+     * @param \XMLReader $xml an XML document to be transformed to GitHub Markdown
+     * @return String
+     */
+    protected function processXml($xml) {
+        $output = '';
+
+        /**
+         * Mapping of elements which just append additional markup to the text
+         */
+        $appendersMap = [
+            self::NODE_HR => '***',
+            self::NODE_BR => "\n",
+            self::NODE_H1 => '# ',
+            self::NODE_H2 => '## ',
+            self::NODE_H3 => '### ',
+            self::NODE_H4 => '#### ',
+            self::NODE_H5 => '##### ',
+            self::NODE_H6 => '###### ',
+            self::NODE_A => '[',
+        ];
+
+        /**
+         * Mapping of elements which wrap text with additional markup
+         */
+        $wrappersMap = [
+            self::NODE_EMPHASIZED => '*',
+            self::NODE_STRONG => '**',
+        ];
+
+        while($xml->read())
+        {
+            // if it's a beginning of new paragraph just continue
+            if($xml->nodeType === \XMLReader::ELEMENT && $xml->name === self::NODE_PARAGRAPH)
+            {
+                continue;
+            }
+
+            // if it's an ending of a paragraph add newlines
+            if($xml->nodeType === \XMLReader::END_ELEMENT && $xml->name === self::NODE_PARAGRAPH)
+            {
+                $output .= "\n\n";
+            }
+
+            // take care of wrapping nodes
+            if(in_array($xml->name, array_keys($wrappersMap)))
+            {
+                $output .= $wrappersMap[$xml->name];
+            }
+
+            // take care of nodes which just append things to their text
+            if(in_array($xml->name, array_keys($appendersMap)) && $xml->nodeType !== \XMLReader::END_ELEMENT)
+            {
+                $output .= $appendersMap[$xml->name];
+            }
+
+            // manipulate blockqoutes' state
+            if($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType !== \XMLReader::END_ELEMENT)
+            {
+                $this->stateMachine['inBlockQuote'] = true;
+            }
+
+            if($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType === \XMLReader::END_ELEMENT)
+            {
+                $this->stateMachine['inBlockQuote'] = false;
+            }
+
+            // links are partly "appenders" but here we need to finish rest of the magic ;)
+            if($xml->name === self::NODE_A && $xml->nodeType === \XMLReader::END_ELEMENT)
+            {
+                $href = $xml->getAttribute('href');
+                $title = $xml->getAttribute('title');
+
+                if(empty($title))
+                {
+                    $output .= '](' . $href . ')';
+                }
+                else
+                {
+                    $output .= '](' . $href . ' "' . $title . '")';
+                }
+            }
+
+            // just add the text
+            if($xml->nodeType === \XMLReader::TEXT)
+            {
+                // but be careful of blackqoute magic :p
+                if($this->stateMachine['inBlockQuote'])
+                {
+                    $output .= '> ';
+                }
+
+                $output .= $xml->readString();
+            }
+        }
+
+        return trim($output);
     }
 }
