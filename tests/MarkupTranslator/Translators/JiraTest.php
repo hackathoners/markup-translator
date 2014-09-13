@@ -17,7 +17,7 @@ class JiraTest extends TestsBase
             ['h6. H6', '<h6>H6</h6>'],
             ['h6. H6', '<h6>H6</h6>'],
             ['----', '<hr/>'],
-#            ['bq. test', '<blockquote>test</blockquote>'],
+            ['bq. test', '<blockquote>test</blockquote>'],
             ["{quote}\ntest\n{quote}", '<blockquote>test</blockquote>'],
             ["{quote}\ntest1\ntest2{quote}", '<blockquote>test1<br/>test2</blockquote>'],
             ['test', '<p>test</p>'],
