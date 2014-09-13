@@ -25,6 +25,7 @@ abstract class Base extends \XMLWriter
     const ATTR_HREF = 'href';
     const ATTR_TITLE = 'title';
 
+    abstract protected function getMarkupName();
     abstract protected function processBlock($line);
 
     public function translate($string)

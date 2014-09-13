@@ -21,6 +21,10 @@ class Github extends Base
         'inStrong' => false,
     ];
 
+    protected function getMarkupName() {
+        return 'GitHub Markdown';
+    }
+
     /**
      * Block elements are:
      * - paragraph
