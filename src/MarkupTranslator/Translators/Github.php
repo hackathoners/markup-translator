@@ -121,19 +121,6 @@ class Github extends Base
         return ''; //All text is consumed
     }
 
-    protected function processParagraph($text)
-    {
-        return $this->wrapInNode(self::NODE_PARAGRAPH, function () use ($text) {
-            $end = $this->lookAhead($text, "\n\n");
-            if ($end === FALSE) {
-                $end = mb_strlen($text);
-            }
-            $this->processInLine(mb_substr($text, 0, $end));
-
-            return trim(mb_substr($text, $end));
-        });
-    }
-
     private function processEmphasized($text)
     {
         $text = mb_substr($text, mb_strlen(self::EMPHASIZED_START_END));

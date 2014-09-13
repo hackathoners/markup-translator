@@ -31,6 +31,9 @@ class Jira extends Base
         if (mb_substr($text, 0, strlen(self::BLOCKQUOTE_BLOCK_START)) === self::BLOCKQUOTE_BLOCK_START) {
             return $this->processBlockquote($text);
         }
+
+        // nothing found wrap in paragraph
+        return $this->processParagraph($text);
     }
 
     private function processBlockquote($text) {
