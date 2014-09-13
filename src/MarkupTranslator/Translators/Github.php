@@ -15,11 +15,6 @@ class Github extends Base
     const MATCH_HR = '/^\s*([\-]{3,}|[\*]{3,})|[\- ]{5,}|[\* ]{5,}\s*$/';
     const MATCH_LINK = '/(.+)\[([^\]]+)\]\(([^\)]+)\)(.+)/';
 
-    private $hrPatternSigns = [
-        '*',
-        '-',
-    ];
-
     protected $stateMachine = [
         'inBlockQuote' => false,
         'inEmphasized' => false,
