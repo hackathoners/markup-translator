@@ -98,4 +98,5 @@ abstract class Base extends \XMLWriter
 
         return ''; // FIXME: return remaining text
     }
+    
 }

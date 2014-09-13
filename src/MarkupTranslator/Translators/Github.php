@@ -231,4 +231,5 @@ class Github extends Base
 
         return $this->processInline($text);
     }
+
 }
