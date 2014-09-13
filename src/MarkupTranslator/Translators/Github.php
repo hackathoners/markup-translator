@@ -261,18 +261,56 @@ class Github extends Base
     protected function processXml($xml) {
         $output = '';
 
+        /**
+         * Mapping of elements which just append additional markup to the text
+         */
+        $appendersMap = [
+            self::NODE_HR => '***',
+            self::NODE_BR => "\n",
+            self::NODE_H1 => '# ',
+            self::NODE_H2 => '## ',
+            self::NODE_H3 => '### ',
+            self::NODE_H4 => '#### ',
+            self::NODE_H5 => '##### ',
+            self::NODE_H6 => '###### ',
+            self::NODE_A => '[',
+        ];
+
+        /**
+         * Mapping of elements which wrap text with additional markup
+         */
+        $wrappersMap = [
+            self::NODE_EMPHASIZED => '*',
+            self::NODE_STRONG => '**',
+        ];
+
         while($xml->read())
         {
+            // if it's a beginning of new paragraph just continue
             if($xml->nodeType === \XMLReader::ELEMENT && $xml->name === self::NODE_PARAGRAPH)
             {
                 continue;
             }
 
-            if($xml->name === self::NODE_BR)
+            // if it's an ending of a paragraph add newlines
+            if($xml->nodeType === \XMLReader::END_ELEMENT && $xml->name === self::NODE_PARAGRAPH)
             {
-                $output .= "\n";
+                $output .= "\n\n";
             }
 
+            // take care of wrapping nodes
+            if(in_array($xml->name, array_keys($wrappersMap)))
+            {
+                $output .= $wrappersMap[$xml->name];
+            }
+
+            // take care of nodes which just append things to their text
+            if(in_array($xml->name, array_keys($appendersMap)) && $xml->nodeType !== \XMLReader::END_ELEMENT)
+            {
+                $output .= $appendersMap[$xml->name];
+            }
+
+            // manipulate blockqoutes' state
             if($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType !== \XMLReader::END_ELEMENT)
             {
                 $this->stateMachine['inBlockQuote'] = true;
@@ -283,35 +321,7 @@ class Github extends Base
                 $this->stateMachine['inBlockQuote'] = false;
             }
 
-            if($xml->name === self::NODE_EMPHASIZED)
-            {
-                $output .= '*';
-            }
-
-            if($xml->name === self::NODE_STRONG)
-            {
-                $output .= '**';
-            }
-
-            if($xml->name === self::NODE_HR)
-            {
-                $output .= '***';
-            }
-
-            if(
-                in_array($xml->name, [self::NODE_H1, self::NODE_H2, self::NODE_H3, self::NODE_H4, self::NODE_H5, self::NODE_H6])
-                && $xml->nodeType !== \XMLReader::END_ELEMENT
-            )
-            {
-                $level = substr($xml->name, 1, 1);
-                $output .= str_repeat('#', $level) . ' ';
-            }
-
-            if($xml->name === self::NODE_A && $xml->nodeType !== \XMLReader::END_ELEMENT)
-            {
-                $output .= '[';
-            }
-
+            // links are partly "appenders" but here we need to finish rest of the magic ;)
             if($xml->name === self::NODE_A && $xml->nodeType === \XMLReader::END_ELEMENT)
             {
                 $href = $xml->getAttribute('href');
@@ -327,19 +337,16 @@ class Github extends Base
                 }
             }
 
+            // just add the text
             if($xml->nodeType === \XMLReader::TEXT)
             {
+                // but be careful of blackqoute magic :p
                 if($this->stateMachine['inBlockQuote'])
                 {
                     $output .= '> ';
                 }
 
                 $output .= $xml->readString();
-            }
-
-            if($xml->nodeType === \XMLReader::END_ELEMENT && $xml->name === self::NODE_PARAGRAPH)
-            {
-                $output .= "\n\n";
             }
         }
 
