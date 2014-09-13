@@ -78,7 +78,25 @@ class GithubTest extends \PHPUnit_Framework_TestCase
     public function testXmlToText_throws_exception()
     {
         $translator = new Github();
-        $this->setExpectedException('Exception', 'Invalid XML source');
-        $translator->xmlToText('test');
+        $this->setExpectedException('Exception', 'Empty source');
+        $translator->xmlToText('            ');
+    }
+
+    /**
+     * @dataProvider xmlToTextProvider
+     */
+    public function testXmlToText($xml, $expected)
+    {
+        $translator = new Github();
+        $this->assertEquals(
+            $expected,
+            $translator->xmlToText($xml)
+        );
+    }
+
+    public function xmlToTextProvider() {
+        return [
+            array_reverse($this->testCases[0])
+        ];
     }
 }

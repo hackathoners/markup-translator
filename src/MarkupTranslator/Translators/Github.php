@@ -259,6 +259,18 @@ class Github extends Base
      * @return String
      */
     protected function processXml($xml) {
-        return '';
+        $output = '';
+
+        while($xml->read()) {
+            if($xml->nodeType === \XMLReader::ELEMENT) {
+                switch($xml->name) {
+                    case self::NODE_PARAGRAPH:
+                        $output .= $xml->readString();
+                        break;
+                }
+            }
+        }
+
+        return $output;
     }
 }

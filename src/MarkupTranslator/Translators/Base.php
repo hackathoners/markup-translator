@@ -78,12 +78,15 @@ abstract class Base extends \XMLWriter
     }
 
     public function xmlToText($source) {
+        $source = trim($source);
+
+        if(empty($source))
+        {
+            throw new \Exception('Empty source');
+        }
+
         $xml = new \XMLReader();
         $xml->XML($source, self::DEFAULT_ENCODING);
-
-        if ( !$xml->isValid()) {
-            throw new \Exception('Invalid XML source');
-        }
 
         return $this->processXml($xml);
     }
