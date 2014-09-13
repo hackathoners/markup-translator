@@ -253,4 +253,12 @@ class Github extends Base
 
         return ''; // FIXME: return remaining text
     }
+
+    /**
+     * @param \XMLReader $xml an XML document to be transformed to GitHub Markdown
+     * @return String
+     */
+    protected function processXml($xml) {
+        return '';
+    }
 }
