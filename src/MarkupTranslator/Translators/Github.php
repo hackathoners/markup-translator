@@ -47,16 +47,16 @@ class Github extends Base
             return $this->addHorizontalRule($text);
         }
 
-        $this->startElement(self::NODE_PARAGRAPH);
+        return $this->wrapInNode(self::NODE_PARAGRAPH, function() use ($text){
+            $end = $this->lookAhead($text, "\n\n");
+            if ($end === FALSE)
+            {
+                $end = mb_strlen($text);
+            }
+            $this->processInLine(mb_substr($text, 0, $end));
 
-        $end = $this->lookAhead($text, "\n\n");
-        if ($end === FALSE)
-        {
-            $end = mb_strlen($text);
-        }
-        $this->processInLine(mb_substr($text, 0, $end));
-        $this->endElement();
-        return trim(mb_substr($text, $end));
+            return trim(mb_substr($text, $end));
+        });
     }
 
     /* Inline elements are:
