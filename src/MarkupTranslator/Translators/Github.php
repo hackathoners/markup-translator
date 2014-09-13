@@ -146,7 +146,6 @@ class Github extends Base
 
     private function findBlockquoteEnd($text)
     {
-        $start = 0;
         $end = mb_strlen($text);
         $lastLineStartPos = mb_strrpos($text, "\n> ");
         if ($lastLineStartPos === false) {
