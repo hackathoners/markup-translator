@@ -105,6 +105,7 @@ class GithubTest extends \PHPUnit_Framework_TestCase
         return [
             $decoratedTestCases[0],
             $decoratedTestCases[1],
+            $decoratedTestCases[2],
         ];
     }
 }

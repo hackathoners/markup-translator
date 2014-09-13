@@ -266,6 +266,10 @@ class Github extends Base
                 continue;
             }
 
+            if($xml->name === self::NODE_BR) {
+                $output .= "\n";
+            }
+
             if($xml->nodeType === \XMLReader::TEXT ) {
                 $output .= $xml->readString();
             }
