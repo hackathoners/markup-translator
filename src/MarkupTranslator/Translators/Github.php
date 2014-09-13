@@ -231,11 +231,4 @@ class Github extends Base
 
         return $this->processInline($text);
     }
-
-    protected function addHorizontalRule($text)
-    {
-        $this->writeElement(self::NODE_HR);
-
-        return ''; // FIXME: return remaining text
-    }
 }

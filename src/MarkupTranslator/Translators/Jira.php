@@ -6,6 +6,7 @@ class Jira extends Base
 {
 
     const MATCH_HEADING = '/h([1-6]{1})\.\s+([^$]+)/';
+    const MATCH_HR = '----';
 
     /**
      * Block elements are:
@@ -20,6 +21,10 @@ class Jira extends Base
         // Process heading
         if (preg_match(self::MATCH_HEADING, $text, $matches)) {
             return $this->addHeading($matches[1], $matches[2]);
+        }
+
+        if (strpos($text, self::MATCH_HR) !== false) {
+            return $this->addHorizontalRule($text);
         }
     }
 

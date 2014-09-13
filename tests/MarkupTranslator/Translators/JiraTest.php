@@ -15,6 +15,8 @@ class JiraTest extends TestsBase
             ['h4. H4', '<h4>H4</h4>'],
             ['h5. H5', '<h5>H5</h5>'],
             ['h6. H6', '<h6>H6</h6>'],
+            ['h6. H6', '<h6>H6</h6>'],
+            ['----', '<hr/>'],
         ];
     }
 
