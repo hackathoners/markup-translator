@@ -38,6 +38,7 @@ abstract class Base extends \XMLWriter
 
         $this->endElement();
         $this->endDocument();
+
         return $this->outputMemory();
     }
 
@@ -51,8 +52,7 @@ abstract class Base extends \XMLWriter
      */
     protected function processDocument($text)
     {
-        while ($text)
-        {
+        while ($text) {
             $text = $this->processBlock($text);
         }
     }
@@ -69,6 +69,7 @@ abstract class Base extends \XMLWriter
         $this->startElement($nodeType);
         $result = $callback();
         $this->endElement();
+
         return $result;
     }
 }

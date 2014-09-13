@@ -5,6 +5,7 @@ namespace MarkupTranslator\Translators;
 class Github extends Base
 {
 
+    const EOL = "\n";
     const BLOCKQUOTE_START = '> ';
     const EMPHASIZED_START_END = '*';
     const STRONG_START_END = '**';
@@ -25,8 +26,7 @@ class Github extends Base
         'inStrong' => false,
     ];
 
-
-    /*
+    /**
      * Block elements are:
      * - paragraph
      * - heading
@@ -37,29 +37,23 @@ class Github extends Base
     protected function processBlock($text)
     {
         // Process heading
-        if (preg_match(self::MATCH_HEADING, $text, $matches))
-        {
+        if (preg_match(self::MATCH_HEADING, $text, $matches)) {
             return $this->addHeading(strlen($matches[1]), $matches[2]);
         }
 
-        if (preg_match(self::MATCH_HR, $text))
-        {
+        if (preg_match(self::MATCH_HR, $text)) {
             return $this->addHorizontalRule($text);
         }
 
-        return $this->wrapInNode(self::NODE_PARAGRAPH, function() use ($text){
-            $end = $this->lookAhead($text, "\n\n");
-            if ($end === FALSE)
-            {
-                $end = mb_strlen($text);
-            }
-            $this->processInLine(mb_substr($text, 0, $end));
+        if (mb_substr($text, 0, 2) === self::BLOCKQUOTE_START) {
+            return $this->processBlockquote($text);
+        }
 
-            return trim(mb_substr($text, $end));
-        });
-    }
+        // nothing found wrap in paragraph
+        return $this->processParagraph($text);
+   }
 
-    /* Inline elements are:
+    /** Inline elements are:
      * - emphasiezed
      * - strong
      * - links
@@ -68,85 +62,83 @@ class Github extends Base
      */
     protected function processInline($text)
     {
-        while ($text)
-        {
-            if (mb_substr($text, 0, 2) === self::BLOCKQUOTE_START)
-            {
-                return $this->processBlockquote($text);
-            }
-
-            if (preg_match(self::MATCH_LINK, $text, $m))
-            {
+        while ($text) {
+            if (preg_match(self::MATCH_LINK, $text, $m)) {
                 return $this->processLink($m[1], $m[2], $m[3], $m[4]);
             }
 
             $importantTextAhead = $this->lookAhead($text, self::STRONG_START_END);
             $emphasizedTextAhead = $this->lookAhead($text, self::EMPHASIZED_START_END);
 
-            if($importantTextAhead === false)
-            {
+            if ($importantTextAhead === false) {
                 $importantTextAhead = $this->lookAhead($text, self::STRONG_START_END_TYPE_2);
             }
 
-            if($emphasizedTextAhead === false)
-            {
+            if ($emphasizedTextAhead === false) {
                 $emphasizedTextAhead = $this->lookAhead($text, self::EMPHASIZED_START_END_TYPE_2);
             }
 
-            if($importantTextAhead !== false && $emphasizedTextAhead !== false)
-            {
-                if($importantTextAhead <= $emphasizedTextAhead)
-                {
+            if ($importantTextAhead !== false && $emphasizedTextAhead !== false) {
+                if ($importantTextAhead <= $emphasizedTextAhead) {
                     $unformattedText = mb_substr($text, 0, $importantTextAhead);
                     $importantText = mb_substr($text, $importantTextAhead);
                     $this->text($unformattedText);
+
                     return $this->processStrong($importantText);
-                }
-                else
-                {
+                } else {
                     $unformattedText = mb_substr($text, 0, $emphasizedTextAhead);
                     $emphasizedText = mb_substr($text, $emphasizedTextAhead);
                     $this->text($unformattedText);
+
                     return $this->processEmphasized($emphasizedText);
                 }
-            }
-            else if($importantTextAhead !== false)
-            {
+            } elseif ($importantTextAhead !== false) {
                 $unformattedText = mb_substr($text, 0, $importantTextAhead);
                 $importantText = mb_substr($text, $importantTextAhead);
                 $this->text($unformattedText);
+
                 return $this->processStrong($importantText);
-            }
-            else if($emphasizedTextAhead !== false)
-            {
+            } elseif ($emphasizedTextAhead !== false) {
                 $unformattedText = mb_substr($text, 0, $emphasizedTextAhead);
                 $emphasizedText = mb_substr($text, $emphasizedTextAhead);
                 $this->text($unformattedText);
+
                 return $this->processEmphasized($emphasizedText);
             }
 
             $end = $this->lookAhead($text, "\n");
-            if ($end === false)
-            {
+            if ($end === false) {
                 $end = mb_strlen($text);
             }
             $this->text(mb_substr($text, 0, $end));
             $text = trim(mb_substr($text, $end));
-            if ($text)
-            {
+            if ($text) {
                 // Add BR if text is not over
                 $this->writeElement(self::NODE_BR);
             }
         };
+
         return ''; //All text is consumed
+    }
+
+    protected function processParagraph($text)
+    {
+        return $this->wrapInNode(self::NODE_PARAGRAPH, function () use ($text) {
+            $end = $this->lookAhead($text, "\n\n");
+            if ($end === FALSE) {
+                $end = mb_strlen($text);
+            }
+            $this->processInLine(mb_substr($text, 0, $end));
+
+            return trim(mb_substr($text, $end));
+        });
     }
 
     private function processEmphasized($text)
     {
         $text = mb_substr($text, mb_strlen(self::EMPHASIZED_START_END));
 
-        if(!$this->stateMachine['inEmphasized'])
-        {
+        if (!$this->stateMachine['inEmphasized']) {
             $this->startElement(self::NODE_EMPHASIZED);
             $this->stateMachine['inEmphasized'] = true;
         } else {
@@ -157,28 +149,54 @@ class Github extends Base
         return $this->processInline($text);
     }
 
+    private function findBlockquoteEnd($text)
+    {
+        $start = 0;
+        $end = mb_strlen($text);
+        $lastLineStartPos = mb_strrpos($text, "\n> ");
+        if ($lastLineStartPos === false) {
+            // one line blockquote
+            $eol = mb_strpos($text, self::EOL);
+        } else {
+            // find end of line for the blockquote
+            $eol = mb_strpos($text, self::EOL,  $lastLineStartPos + 1);
+        }
+        if ($eol !== false) {
+            echo 3;
+
+            return $eol;
+        }
+
+        return $end;
+    }
+
+    private function stripBlockquote($text)
+    {
+        $result = [];
+        foreach (explode(self::EOL, $text) as $line) {
+            $result[] = ltrim($line, '> ');
+        }
+
+        return implode(self::EOL, $result);
+    }
+
     private function processBlockquote($text)
     {
-        $text = mb_substr($text, mb_strlen(self::BLOCKQUOTE_START));
-        if(!$this->stateMachine['inBlockQuote'])
-        {
-            $this->startElement(self::NODE_BLOCKQUOTE);
-            $this->stateMachine['inBlockQuote'] = true;
+        $start = 0;
+        $end = $this->findBlockquoteEnd($text);
+        $blockquote = $this->stripBlockquote(mb_substr($text, $start, $end));
+        $this->wrapInNode(self::NODE_BLOCKQUOTE, function () use ($blockquote) {
+            $this->processInline($blockquote);
+        });
 
-            $this->processInline($text);
-
-            $this->stateMachine['inBlockQuote'] = false;
-            return $this->endElement();
-        }
-        return $this->processInline($text);
+        return mb_substr($text, $end);
     }
 
     private function processLink($before, $text, $link, $after)
     {
         $title = '';
 
-        if (preg_match('/\"(.+)\"/', $link, $m))
-        {
+        if (preg_match('/\"(.+)\"/', $link, $m)) {
             $title = trim($m[1]);
         }
 
@@ -188,14 +206,14 @@ class Github extends Base
         $this->startElement(self::NODE_A);
         $this->writeAttribute(self::ATTR_HREF, $link);
 
-        if (!empty($title))
-        {
+        if (!empty($title)) {
             $this->writeAttribute(self::ATTR_TITLE, $title);
         }
 
         $this->text($text);
         $this->endElement();
         $this->text($after);
+
         return true;
     }
 
@@ -203,8 +221,7 @@ class Github extends Base
     {
         $text = mb_substr($text, mb_strlen(self::STRONG_START_END));
 
-        if(!$this->stateMachine['inStrong'])
-        {
+        if (!$this->stateMachine['inStrong']) {
             $this->startElement(self::NODE_STRONG);
             $this->stateMachine['inStrong'] = true;
         } else {
@@ -215,7 +232,8 @@ class Github extends Base
         return $this->processInline($text);
     }
 
-    protected function addHeading($level, $text) {
+    protected function addHeading($level, $text)
+    {
         $nodeType = [
             1 => self::NODE_H1,
             2 => self::NODE_H2,
@@ -224,13 +242,16 @@ class Github extends Base
             5 => self::NODE_H5,
             6 => self::NODE_H6,
         ][$level];
-        return $this->wrapInNode($nodeType, function() use ($text){
+
+        return $this->wrapInNode($nodeType, function () use ($text) {
             return $this->processInline($text);
         });
     }
 
-    protected function addHorizontalRule($text) {
+    protected function addHorizontalRule($text)
+    {
         $this->writeElement(self::NODE_HR);
+
         return ''; // FIXME: return remaining text
     }
 }
