@@ -107,13 +107,13 @@ class GithubTest extends \PHPUnit_Framework_TestCase
             ['<root><p>This text will not be bold. <strong>But this will be.</strong> And this again without bold.</p></root>', 'This text will not be bold. **But this will be.** And this again without bold.'],
             ['<root><p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p></root>', '**Everyone *must* attend the meeting at 5 today.**'],
             ['<hr/>', '***'],
-            /*
             ['<h1>H1</h1>', '# H1'],
             ['<h2>H2</h2>', '## H2'],
             ['<h3>H3</h3>', '### H3'],
             ['<h4>H4</h4>', '#### H4'],
             ['<h5>H5</h5>', '##### H5'],
             ['<h6>H6</h6>', '###### H6'],
+            /*
             ['<p>This is an <a href="http://example.com/">example link</a>.</p>', 'This is an [example link](http://example.com/).'],
             ['<p>This is an <a href="http://example.com/" title="With a Title">example link</a>.</p>', 'This is an [example link](http://example.com/ "With a Title").'],
             */

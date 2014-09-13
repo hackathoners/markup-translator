@@ -290,6 +290,14 @@ class Github extends Base
                 $output .= '***';
             }
 
+            if(
+                in_array($xml->name, [self::NODE_H1, self::NODE_H2, self::NODE_H3, self::NODE_H4, self::NODE_H5, self::NODE_H6])
+                && $xml->nodeType !== \XMLReader::END_ELEMENT
+            ) {
+                $level = substr($xml->name, 1, 1);
+                $output .= str_repeat('#', $level) . ' ';
+            }
+
             if($xml->nodeType === \XMLReader::TEXT) {
                 if($this->stateMachine['inBlockQuote']) {
                     $output .= '> ';
