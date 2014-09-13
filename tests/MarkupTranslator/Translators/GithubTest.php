@@ -2,18 +2,8 @@
 
 namespace MarkupTranslator\Translators;
 
-class GithubTest extends \PHPUnit_Framework_TestCase
+class GithubTest extends TestsBase
 {
-
-    private function cleanXML($text) {
-        $replace = [
-            '<?xml version="1.0" encoding="UTF-8"?>' => '',
-            "\n" => '',
-            '<body>' => '',
-            '</body>' => '',
-        ];
-        return str_replace(array_keys($replace), $replace, $text);
-    }
 
     public function translateProvider()
     {
@@ -70,4 +60,5 @@ class GithubTest extends \PHPUnit_Framework_TestCase
             $this->cleanXml($translator->translate($text))
         );
     }
+
 }
