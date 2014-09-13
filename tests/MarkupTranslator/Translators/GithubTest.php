@@ -106,6 +106,8 @@ class GithubTest extends \PHPUnit_Framework_TestCase
             $decoratedTestCases[0],
             $decoratedTestCases[1],
             $decoratedTestCases[2],
+            $decoratedTestCases[3],
+            $decoratedTestCases[4],
         ];
     }
 }

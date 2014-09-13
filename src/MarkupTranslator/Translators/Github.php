@@ -270,7 +270,19 @@ class Github extends Base
                 $output .= "\n";
             }
 
-            if($xml->nodeType === \XMLReader::TEXT ) {
+            if($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType !== \XMLReader::END_ELEMENT) {
+                $this->stateMachine['inBlockQuote'] = true;
+            }
+
+            if($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType === \XMLReader::END_ELEMENT) {
+                $this->stateMachine['inBlockQuote'] = false;
+            }
+
+            if($xml->nodeType === \XMLReader::TEXT) {
+                if($this->stateMachine['inBlockQuote']) {
+                    $output .= '> ';
+                }
+
                 $output .= $xml->readString();
             }
 
