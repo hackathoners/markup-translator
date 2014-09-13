@@ -278,6 +278,14 @@ class Github extends Base
                 $this->stateMachine['inBlockQuote'] = false;
             }
 
+            if($xml->name === self::NODE_EMPHASIZED) {
+                $output .= '*';
+            }
+
+            if($xml->name === self::NODE_STRONG) {
+                $output .= '**';
+            }
+
             if($xml->nodeType === \XMLReader::TEXT) {
                 if($this->stateMachine['inBlockQuote']) {
                     $output .= '> ';
