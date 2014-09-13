@@ -25,7 +25,7 @@ abstract class Base extends \XMLWriter
     const ATTR_HREF = 'href';
     const ATTR_TITLE = 'title';
 
-    abstract protected function processDocument($line);
+    abstract protected function processBlock($line);
 
     public function translate($string)
     {
@@ -38,11 +38,38 @@ abstract class Base extends \XMLWriter
 
         $this->endElement();
         $this->endDocument();
+
         return $this->outputMemory();
     }
 
     protected function lookAhead($haystack, $needle, $offset = 0)
     {
         return strpos($haystack, $needle, $offset);
+    }
+
+    /**
+     * Loop through the whole document
+     */
+    protected function processDocument($text)
+    {
+        while ($text) {
+            $text = $this->processBlock($text);
+        }
+    }
+
+    /**
+     * Wrap callable block in node
+     */
+    protected function wrapInNode($nodeType, $callback)
+    {
+        // Sanity check
+        assert(is_string($nodeType));
+        assert(is_callable($callback));
+
+        $this->startElement($nodeType);
+        $result = $callback();
+        $this->endElement();
+
+        return $result;
     }
 }
