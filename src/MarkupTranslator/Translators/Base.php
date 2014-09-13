@@ -81,10 +81,10 @@ abstract class Base extends \XMLWriter
         $xml = new \XMLReader();
         $xml->XML($source, self::DEFAULT_ENCODING);
 
-        if ($xml->isValid()) {
-            $this->processXml($xml);
-        } else {
+        if ( !$xml->isValid()) {
             throw new \Exception('Invalid XML source');
         }
+
+        return $this->processXml($xml);
     }
 }
