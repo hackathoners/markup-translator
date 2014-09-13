@@ -65,18 +65,7 @@ class Jira extends Base
     protected function processInline($text)
     {
         while($text) {
-            $end = $this->lookAhead($text, "\n");
-            if ($end === false) {
-                $end = mb_strlen($text);
-            }
-
-            $this->text(mb_substr($text, 0, $end));
-            $text = trim(mb_substr($text, $end));
-
-            if ($text) {
-                // Add BR if text is not over
-                $this->writeElement(self::NODE_BR);
-            }
+            $text = $this->processRestOfLine($text);
         }
 
         return ''; //All text is consumed
