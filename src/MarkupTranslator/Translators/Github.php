@@ -241,7 +241,8 @@ class Github extends Base
             4 => self::NODE_H4,
             5 => self::NODE_H5,
             6 => self::NODE_H6,
-        ][$level];
+        ];
+        $nodeType = $nodeType[$level];
 
         return $this->wrapInNode($nodeType, function () use ($text) {
             return $this->processInline($text);
