@@ -20,6 +20,9 @@ class JiraTest extends TestsBase
 #            ['bq. test', '<blockquote>test</blockquote>'],
             ["{quote}\ntest\n{quote}", '<blockquote>test</blockquote>'],
             ["{quote}\ntest1\ntest2{quote}", '<blockquote>test1<br/>test2</blockquote>'],
+            ['test', '<p>test</p>'],
+            ["test1\n\ntest2", '<p>test1</p><p>test2</p>'],
+            ["test1\ntest2", '<p>test1<br/>test2</p>'],
         ];
     }
 
