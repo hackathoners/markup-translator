@@ -12,11 +12,13 @@ class Jira extends Base
     const EMPHASIZED_START_END = '_';
     const STRONG_START_END = '*';
 
-    protected function getMarkupName() {
+    protected function getMarkupName()
+    {
         return 'jira';
     }
 
-    protected function processXml($xml) {
+    protected function processXml($xml)
+    {
         // TODO: Implement me
         return $xml;
     }
@@ -28,7 +30,7 @@ class Jira extends Base
      * - blockquote (multiline)
      * - code (multiline)
      *
-     * @param string $text text to be proccessed
+     * @param  string $text text to be proccessed
      * @return string
      */
     protected function processBlock($text)
@@ -56,12 +58,13 @@ class Jira extends Base
     /**
      * Processes text wrapped in markup saying it's emphasized
      *
-     * @param string $text text to be processed into a <em/> tag
-     * @param bool $inline flag telling if it's an inline blockquote or not
+     * @param  string $text   text to be processed into a <em/> tag
+     * @param  bool   $inline flag telling if it's an inline blockquote or not
      * @return string
      */
-    private function processBlockquote($text, $inline = false) {
-        if( $inline ) {
+    private function processBlockquote($text, $inline = false)
+    {
+        if ($inline) {
             $length = 0;
             $text = str_replace(self::BLOCKQUOTE_INLINE_START, '', $text); // remove bq.
         } else {
@@ -71,7 +74,7 @@ class Jira extends Base
 
         $end = $this->findBlockquoteEnd($text, $inline);
         $blockquote = mb_substr($text, 0, $end);
-        $this->wrapInNode(self::NODE_BLOCKQUOTE, function() use ($blockquote) {
+        $this->wrapInNode(self::NODE_BLOCKQUOTE, function () use ($blockquote) {
             $this->processInline($blockquote);
         });
 
@@ -81,22 +84,20 @@ class Jira extends Base
     /**
      * Looks for an end of blockqoute and returns the possition of the end
      *
-     * @param string $text text being processed as blockqoute block
-     * @param bool $inline
+     * @param  string $text   text being processed as blockqoute block
+     * @param  bool   $inline
      * @return int
      */
     private function findBlockquoteEnd($text, $inline = false)
     {
         $end = $this->lookAhead($text, ($inline ? "\n" : self::BLOCKQUOTE_BLOCK_START));
 
-        if ($end === false && !$inline)
-        {
+        if ($end === false && !$inline) {
             // the text may include only blockqoute and no new line at the end
             $end = $this->lookAhead($text, str_replace("\n", '', self::BLOCKQUOTE_BLOCK_START));
         }
 
-        if ($end === false)
-        {
+        if ($end === false) {
             $end = mb_strlen($text);
         }
 
@@ -106,51 +107,54 @@ class Jira extends Base
     /**
      * Processes text wrapped in markup saying it's emphasized
      *
-     * @param string $text text to be processed into a <em/> tag
+     * @param  string $text text to be processed into a <em/> tag
      * @return string
      */
-    private function processEmphasized($text) {
+    private function processEmphasized($text)
+    {
         return $this->processWrapper($text, self::EMPHASIZED_START_END, self::NODE_EMPHASIZED);
     }
 
     /**
      * Processes text wrapped in markup saying it's important
      *
-     * @param string $text text to be processed into a <strong/> tag
+     * @param  string $text text to be processed into a <strong/> tag
      * @return string
      */
-    private function processStrong($text) {
+    private function processStrong($text)
+    {
         return $this->processWrapper($text, self::STRONG_START_END, self::NODE_STRONG);
     }
 
     /**
      * Common logic for wrapping markup such as <em/> and <strong/> tags
      *
-     * @param string $text text to be processed
+     * @param string $text             text to be processed
      * @param string $formattingMarkup markup to process; one of class constants such as:
-     *      EMPHASIZED_START_END or STRONG_START_END
-     * @param string $nodeTag XML tag to be produced; one of class constants such as:
-     *      NODE_EMPHASIZED or NODE_STRONG
-     * @param int $markupLength
+     *                                 EMPHASIZED_START_END or STRONG_START_END
+     * @param string $nodeTag          XML tag to be produced; one of class constants such as:
+     *                                 NODE_EMPHASIZED or NODE_STRONG
+     * @param int    $markupLength
      *
      * @return string
      */
-    private function processWrapper($text, $formattingMarkup, $nodeTag, $markupLength = 1) {
+    private function processWrapper($text, $formattingMarkup, $nodeTag, $markupLength = 1)
+    {
         $formattedTextBegin = $this->lookAhead($text, $formattingMarkup);
         $beforeFormattedText = mb_substr($text, 0, $formattedTextBegin);
         $formattedTextEnd = $this->lookAhead(mb_substr($text, $formattedTextBegin + $markupLength), $formattingMarkup);
         $afterFormattedText = mb_substr(mb_substr($text, $formattedTextBegin + $markupLength), $formattedTextEnd + $markupLength);
         $formattedText = mb_substr($text, $formattedTextBegin + $markupLength, $formattedTextEnd);
 
-        if( $beforeFormattedText !== '' ) {
+        if ($beforeFormattedText !== '') {
             $this->text($beforeFormattedText);
         }
 
-        $this->wrapInNode($nodeTag, function() use ($formattedText) {
+        $this->wrapInNode($nodeTag, function () use ($formattedText) {
             $this->processInline($formattedText);
         });
 
-        if( $afterFormattedText !== '' ) {
+        if ($afterFormattedText !== '') {
             $this->text($afterFormattedText);
         }
 
@@ -170,12 +174,12 @@ class Jira extends Base
      */
     protected function processInline($text)
     {
-        while($text) {
-            if( $this->lookAhead($text, self::STRONG_START_END) !== false ) {
+        while ($text) {
+            if ( $this->lookAhead($text, self::STRONG_START_END) !== false ) {
                 return $this->processStrong($text);
             }
 
-            if( $this->lookAhead($text, self::EMPHASIZED_START_END) !== false ) {
+            if ( $this->lookAhead($text, self::EMPHASIZED_START_END) !== false ) {
                 return $this->processEmphasized($text);
             }
 

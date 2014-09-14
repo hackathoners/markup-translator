@@ -18,6 +18,7 @@ class Translator
         $fromTranslator = new $fromClass();
         $toClass = 'MarkupTranslator\\Translators\\' . $markups[$to];
         $toTranslator = new $toClass();
+
         return $toTranslator->xmlToText($fromTranslator->translate($text));
     }
 

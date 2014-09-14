@@ -2,7 +2,8 @@
 
 $loader = require __DIR__ . "/../vendor/autoload.php";
 
-function cleanXML($text) {
+function cleanXML($text)
+{
     $replace = [
         '<?xml version="1.0" encoding="UTF-8"?>' => '',
         "\n" => '',
@@ -10,11 +11,11 @@ function cleanXML($text) {
         '</body>' => '',
         '<body/>' => '',
     ];
+
     return str_replace(array_keys($replace), $replace, $text);
 }
 
-function decorateWithRootNode($xmlString) {
+function decorateWithRootNode($xmlString)
+{
     return '<root>' . $xmlString . '</root>';
 }
-
-

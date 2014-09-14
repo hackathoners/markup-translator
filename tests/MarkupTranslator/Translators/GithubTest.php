@@ -82,7 +82,8 @@ class GithubTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function xmlToTextProvider() {
+    public function xmlToTextProvider()
+    {
         return [
             ['<p>test</p> ', 'test'],
             ['<p>test1</p><p>test2</p> ', "test1\n\ntest2"],
