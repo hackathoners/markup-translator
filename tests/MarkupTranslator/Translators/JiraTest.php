@@ -23,6 +23,9 @@ class JiraTest extends TestsBase
             ['test', '<p>test</p>'],
             ["test1\n\ntest2", '<p>test1</p><p>test2</p>'],
             ["test1\ntest2", '<p>test1<br/>test2</p>'],
+            ['_This text will be emphasized_', '<p><em>This text will be emphasized</em></p>'],
+            ['This text will not be emphasized. _But this will be._', '<p>This text will not be emphasized. <em>But this will be.</em></p>'],
+            ['This text will not be emphasized. _But this will be._ And this again not emphasized.', '<p>This text will not be emphasized. <em>But this will be.</em> And this again not emphasized.</p>'],
         ];
     }
 
