@@ -19,11 +19,90 @@ class Jira extends Base
         return 'jira';
     }
 
+    /**
+     * @param  \XMLReader $xml an XML document to be transformed to GitHub Markdown
+     * @return String
+     */
     protected function processXml($xml)
     {
-        // TODO: Implement me
-        return $xml;
+        $output = '';
+
+        // states
+        $inLink = false;
+
+        /**
+         * Mapping of elements which just append additional markup to the text
+         */
+        $appendersMap = [
+            self::NODE_HR => '----',
+            self::NODE_BR => "\n",
+            self::NODE_H1 => 'h1. ',
+            self::NODE_H2 => 'h2. ',
+            self::NODE_H3 => 'h3. ',
+            self::NODE_H4 => 'h4. ',
+            self::NODE_H5 => 'h5. ',
+            self::NODE_H6 => 'h6. ',
+            self::NODE_BLOCKQUOTE => 'bq. ',
+        ];
+
+        /**
+         * Mapping of elements which wrap text with additional markup
+         */
+        $wrappersMap = [
+            self::NODE_EMPHASIZED => '_',
+            self::NODE_STRONG => '*',
+        ];
+
+        while ($xml->read()) {
+            // if it's a beginning of new paragraph just continue
+            if ($xml->nodeType === \XMLReader::ELEMENT && $xml->name === self::NODE_PARAGRAPH) {
+                continue;
+            }
+
+            // if it's an ending of a paragraph add newlines
+            if ($xml->nodeType === \XMLReader::END_ELEMENT && $xml->name === self::NODE_PARAGRAPH) {
+                $output .= "\n\n";
+            }
+
+            // take care of wrapping nodes
+            if (in_array($xml->name, array_keys($wrappersMap))) {
+                $output .= $wrappersMap[$xml->name];
+            }
+
+            // take care of nodes which just append things to their text
+            if (in_array($xml->name, array_keys($appendersMap)) && $xml->nodeType !== \XMLReader::END_ELEMENT) {
+                $output .= $appendersMap[$xml->name];
+            }
+
+            // links
+            if ($xml->name === self::NODE_A && $xml->nodeType !== \XMLReader::END_ELEMENT) {
+                $output .= '[';
+                $inLink = true;
+            }
+
+            if ($xml->name === self::NODE_A && $xml->nodeType === \XMLReader::END_ELEMENT) {
+                $output .= $xml->getAttribute('href') . ']';
+                $inLink = false;
+            }
+
+            // just add the text
+            if ($xml->nodeType === \XMLReader::TEXT) {
+                $text = $xml->readString();
+
+                if ($inLink && !empty($text) )
+                {
+                    $output .= $text . '|' ;
+                }
+                else
+                {
+                    $output .= $text;
+                }
+            }
+        }
+
+        return trim($output);
     }
+
     /**
      * Processing block elements. Block elements are:
      * - paragraph

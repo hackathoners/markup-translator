@@ -50,4 +50,41 @@ class JiraTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider xmlToTextProvider
+     */
+    public function testXmlToText($xml, $expected)
+    {
+        $translator = new Jira();
+        $this->assertEquals(
+            $expected,
+            $translator->xmlToText(decorateWithRootNode($xml))
+        );
+    }
+
+    public function xmlToTextProvider()
+    {
+        return [
+            ['<p>test</p> ', 'test'],
+            ['<p>test1</p><p>test2</p> ', "test1\n\ntest2"],
+            ['<p>test1<br/>test2</p> ', "test1\ntest2"],
+            ['<blockquote>inline blockquote</blockquote> ', 'bq. inline blockquote'],
+#            ['<blockquote>test1<br/>test2</blockquote> ', "{quote}\ntest1\ntest2{quote}"],
+            ['<p><em>This text will be emphasized</em></p> ', '_This text will be emphasized_'],
+            ['<p>This text will not be emphasized. <em>But this will be.</em></p> ', 'This text will not be emphasized. _But this will be._'],
+            ['<p>This text will not be emphasized. <em>But this will be.</em> And this again not emphasized.</p> ', 'This text will not be emphasized. _But this will be._ And this again not emphasized.'],
+            ['<p><strong>This text will be bold</strong></p> ', '*This text will be bold*'],
+            ['<p>This text will not be bold. <strong>But this will be.</strong></p> ', 'This text will not be bold. *But this will be.*'],
+            ['<p>This text will not be bold. <strong>But this will be.</strong> And this again without bold.</p> ', 'This text will not be bold. *But this will be.* And this again without bold.'],
+            ['<p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p> ', '*Everyone _must_ attend the meeting at 5 today.*'],
+            ['<hr/>', '----'],
+            ['<h1>H1</h1>', 'h1. H1'],
+            ['<h2>H2</h2>', 'h2. H2'],
+            ['<h3>H3</h3>', 'h3. H3'],
+            ['<h4>H4</h4>', 'h4. H4'],
+            ['<h5>H5</h5>', 'h5. H5'],
+            ['<h6>H6</h6>', 'h6. H6'],
+            ['<p>This is an <a href="http://example.com/">example link</a>.</p>', 'This is an [example link|http://example.com/].'],
+        ];
+    }
 }
