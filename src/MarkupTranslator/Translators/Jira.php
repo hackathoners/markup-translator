@@ -10,6 +10,7 @@ class Jira extends Base
     const BLOCKQUOTE_INLINE_START = 'bq. ';
     const BLOCKQUOTE_BLOCK_START = "{quote}\n";
     const EMPHASIZED_START_END = '_';
+    const STRONG_START_END = '*';
 
     /**
      * Block elements are:
@@ -99,6 +100,28 @@ class Jira extends Base
         return '';
     }
 
+    private function processStrong($text) {
+        $strongTextBegin = $this->lookAhead($text, self::STRONG_START_END);
+        $beforeStrongText = mb_substr($text, 0, $strongTextBegin);
+        $strongTextEnd = $this->lookAhead(mb_substr($text, $strongTextBegin + 1), self::STRONG_START_END);
+        $afterStrongText = mb_substr(mb_substr($text, $strongTextBegin + 1), $strongTextEnd + 1);
+        $strongText = mb_substr($text, $strongTextBegin + 1, $strongTextEnd);
+
+        if( $beforeStrongText !== '' ) {
+            $this->processInline($beforeStrongText);
+        }
+
+        $this->wrapInNode(self::NODE_STRONG, function() use ($strongText) {
+            $this->processInline($strongText);
+        });
+
+        if( $afterStrongText !== '' ) {
+            $this->processInline($afterStrongText);
+        }
+
+        return '';
+    }
+
     /** Inline elements are:
      * - emphasiezed
      * - strong
@@ -109,9 +132,12 @@ class Jira extends Base
     protected function processInline($text)
     {
         while($text) {
-            $emphasizedTextAhead = $this->lookAhead($text, self::EMPHASIZED_START_END);
-            if( $emphasizedTextAhead !== false ) {
+            if( $this->lookAhead($text, self::EMPHASIZED_START_END) !== false ) {
                 return $this->processEmphasized($text);
+            }
+
+            if( $this->lookAhead($text, self::STRONG_START_END) !== false ) {
+                return $this->processStrong($text);
             }
 
             $text = $this->processRestOfLine($text);

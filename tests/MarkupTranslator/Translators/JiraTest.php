@@ -26,6 +26,9 @@ class JiraTest extends TestsBase
             ['_This text will be emphasized_', '<p><em>This text will be emphasized</em></p>'],
             ['This text will not be emphasized. _But this will be._', '<p>This text will not be emphasized. <em>But this will be.</em></p>'],
             ['This text will not be emphasized. _But this will be._ And this again not emphasized.', '<p>This text will not be emphasized. <em>But this will be.</em> And this again not emphasized.</p>'],
+            ['*This text will be bold*', '<p><strong>This text will be bold</strong></p>'],
+            ['This text will not be bold. *But this will be.*', '<p>This text will not be bold. <strong>But this will be.</strong></p>'],
+            ['This text will not be bold. *But this will be.* And this again without bold.', '<p>This text will not be bold. <strong>But this will be.</strong> And this again without bold.</p>'],
         ];
     }
 
