@@ -79,44 +79,30 @@ class Jira extends Base
     }
 
     private function processEmphasized($text) {
-        $emphasizedTextBegin = $this->lookAhead($text, self::EMPHASIZED_START_END);
-        $beforeEmphasizedText = mb_substr($text, 0, $emphasizedTextBegin);
-        $emphasizedTextEnd = $this->lookAhead(mb_substr($text, $emphasizedTextBegin + 1), self::EMPHASIZED_START_END);
-        $afterEmphasizedText = mb_substr(mb_substr($text, $emphasizedTextBegin + 1), $emphasizedTextEnd + 1);
-        $emphasizedText = mb_substr($text, $emphasizedTextBegin + 1, $emphasizedTextEnd);
-
-        if( $beforeEmphasizedText !== '' ) {
-            $this->processInline($beforeEmphasizedText);
-        }
-
-        $this->wrapInNode(self::NODE_EMPHASIZED, function() use ($emphasizedText) {
-            $this->processInline($emphasizedText);
-        });
-
-        if( $afterEmphasizedText !== '' ) {
-            $this->processInline($afterEmphasizedText);
-        }
-
-        return '';
+        return $this->processWrapper($text, self::EMPHASIZED_START_END, self::NODE_EMPHASIZED);
     }
 
     private function processStrong($text) {
-        $strongTextBegin = $this->lookAhead($text, self::STRONG_START_END);
-        $beforeStrongText = mb_substr($text, 0, $strongTextBegin);
-        $strongTextEnd = $this->lookAhead(mb_substr($text, $strongTextBegin + 1), self::STRONG_START_END);
-        $afterStrongText = mb_substr(mb_substr($text, $strongTextBegin + 1), $strongTextEnd + 1);
-        $strongText = mb_substr($text, $strongTextBegin + 1, $strongTextEnd);
+        return $this->processWrapper($text, self::STRONG_START_END, self::NODE_STRONG);
+    }
 
-        if( $beforeStrongText !== '' ) {
-            $this->processInline($beforeStrongText);
+    private function processWrapper($text, $formattingMarkup, $nodeTag, $markupLength = 1) {
+        $formattedTextBegin = $this->lookAhead($text, $formattingMarkup);
+        $beforeFormattedText = mb_substr($text, 0, $formattedTextBegin);
+        $formattedTextEnd = $this->lookAhead(mb_substr($text, $formattedTextBegin + $markupLength), $formattingMarkup);
+        $afterFormattedText = mb_substr(mb_substr($text, $formattedTextBegin + $markupLength), $formattedTextEnd + $markupLength);
+        $formattedText = mb_substr($text, $formattedTextBegin + $markupLength, $formattedTextEnd);
+
+        if( $beforeFormattedText !== '' ) {
+            $this->processInline($beforeFormattedText);
         }
 
-        $this->wrapInNode(self::NODE_STRONG, function() use ($strongText) {
-            $this->processInline($strongText);
+        $this->wrapInNode($nodeTag, function() use ($formattedText) {
+            $this->processInline($formattedText);
         });
 
-        if( $afterStrongText !== '' ) {
-            $this->processInline($afterStrongText);
+        if( $afterFormattedText !== '' ) {
+            $this->processInline($afterFormattedText);
         }
 
         return '';
