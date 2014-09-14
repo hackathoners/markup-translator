@@ -25,14 +25,18 @@ abstract class Base extends \XMLWriter
     const ATTR_HREF = 'href';
     const ATTR_TITLE = 'title';
 
+    const DEFAULT_ENCODING = 'UTF-8';
+
+    abstract protected function getMarkupName();
     abstract protected function processBlock($line);
     abstract protected function processInline($text);
+    abstract protected function processXml($xml);
 
     public function translate($string)
     {
         $this->openMemory();
         $this->setIndent(false);
-        $this->startDocument('1.0', 'UTF-8');
+        $this->startDocument('1.0', self::DEFAULT_ENCODING);
         $this->startElement(self::NODE_ROOT);
 
         $this->processDocument($string);
@@ -129,4 +133,17 @@ abstract class Base extends \XMLWriter
         return $text;
     }
 
+    public function xmlToText($source) {
+        $source = trim($source);
+
+        if(empty($source))
+        {
+            throw new \Exception('Empty source');
+        }
+
+        $xml = new \XMLReader();
+        $xml->XML($source, self::DEFAULT_ENCODING);
+
+        return $this->processXml($xml);
+    }
 }

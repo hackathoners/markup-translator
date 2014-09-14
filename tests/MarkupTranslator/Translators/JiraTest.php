@@ -2,7 +2,7 @@
 
 namespace MarkupTranslator\Translators;
 
-class JiraTest extends TestsBase
+class JiraTest extends \PHPUnit_Framework_TestCase
 {
     public function translateProvider()
     {
@@ -43,7 +43,7 @@ class JiraTest extends TestsBase
         $translator = new Jira();
         $this->assertEquals(
             $expected,
-            $this->cleanXml($translator->translate($text))
+            cleanXml($translator->translate($text))
         );
     }
 

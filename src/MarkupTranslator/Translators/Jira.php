@@ -12,6 +12,14 @@ class Jira extends Base
     const EMPHASIZED_START_END = '_';
     const STRONG_START_END = '*';
 
+    protected function getMarkupName() {
+        return 'jira';
+    }
+
+    protected function processXml($xml) {
+        // TODO: Implement me
+        return $xml;
+    }
     /**
      * Processing block elements. Block elements are:
      * - paragraph
