@@ -11,7 +11,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTranslate()
     {
         $testCase = 'test';
-        $this->assertEquals($testCase, Translator::translate($testCase, '', ''));
+        $this->assertEquals($testCase, Translator::translate($testCase, 'github', 'github'));
     }
 
 
