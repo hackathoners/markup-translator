@@ -29,6 +29,7 @@ abstract class Base extends \XMLWriter
 
     abstract protected function getMarkupName();
     abstract protected function processBlock($line);
+    abstract protected function processInline($text);
     abstract protected function processXml($xml);
 
     public function translate($string)
@@ -75,6 +76,61 @@ abstract class Base extends \XMLWriter
         $this->endElement();
 
         return $result;
+    }
+
+    protected function addHeading($level, $text)
+    {
+        $nodeType = [
+            1 => self::NODE_H1,
+            2 => self::NODE_H2,
+            3 => self::NODE_H3,
+            4 => self::NODE_H4,
+            5 => self::NODE_H5,
+            6 => self::NODE_H6,
+        ];
+
+        $nodeType = $nodeType[$level];
+
+        return $this->wrapInNode($nodeType, function() use ($text) {
+            return $this->processInline($text);
+        });
+    }
+
+    protected function addHorizontalRule($text)
+    {
+        $this->writeElement(self::NODE_HR);
+
+        return ''; // FIXME: return remaining text
+    }
+
+    protected function processParagraph($text)
+    {
+        return $this->wrapInNode(self::NODE_PARAGRAPH, function () use ($text) {
+            $end = $this->lookAhead($text, "\n\n");
+            if ($end === FALSE) {
+                $end = mb_strlen($text);
+            }
+            $this->processInLine(mb_substr($text, 0, $end));
+
+            return trim(mb_substr($text, $end));
+        });
+    }
+
+    protected function processRestOfLine($text) {
+        $end = $this->lookAhead($text, "\n");
+        if ($end === false) {
+            $end = mb_strlen($text);
+        }
+
+        $this->text(mb_substr($text, 0, $end));
+        $text = trim(mb_substr($text, $end));
+
+        if ($text) {
+            // Add BR if text is not over
+            $this->writeElement(self::NODE_BR);
+        }
+
+        return $text;
     }
 
     public function xmlToText($source) {
