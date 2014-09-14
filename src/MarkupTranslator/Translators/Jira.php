@@ -7,6 +7,8 @@ class Jira extends Base
 
     const MATCH_HEADING = '/h([1-6]{1})\.\s+([^$]+)/';
     const MATCH_HR = '----';
+    const MATCH_LINK = '/(http|https):\/\/[^$\s\]]+/';
+
     const BLOCKQUOTE_INLINE_START = 'bq. ';
     const BLOCKQUOTE_BLOCK_START = "{quote}\n";
     const EMPHASIZED_START_END = '_';
@@ -149,6 +151,32 @@ class Jira extends Base
         return '';
     }
 
+    /**
+     * Processes text with a link markup
+     *
+     * @param string $text text with a link
+     * @param string $link the link gathered from preg_match()
+     * @return string
+     */
+    private function processLink($text, $link) {
+        $link = rtrim($link, '.');
+        $pipe = explode('|', $text);
+
+        if (mb_strlen($pipe[0]) !== mb_strlen($text)) {
+            $pipe = explode('[', $pipe[0]);
+            $linkText = $pipe[1];
+            $search = '[' . $linkText . '|' . $link . ']';
+            $replace = sprintf('<a href="%s">%s</a>', $link, $linkText);
+        } else {
+            $search = $link;
+            $replace = sprintf('<a href="%s">%s</a>', $link, $link);
+        }
+
+        $this->writeRaw(str_replace($search, $replace, $text));
+
+        return '';
+    }
+
     /** Inline elements are:
      * - emphasiezed
      * - strong
@@ -163,6 +191,10 @@ class Jira extends Base
     protected function processInline($text)
     {
         while($text) {
+            if (preg_match(self::MATCH_LINK, $text, $m)) {
+                return $this->processLink($text, $m[0]);
+            }
+
             if( $this->lookAhead($text, self::STRONG_START_END) !== false ) {
                 return $this->processStrong($text);
             }

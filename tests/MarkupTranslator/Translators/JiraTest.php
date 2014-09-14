@@ -31,6 +31,9 @@ class JiraTest extends TestsBase
             ['This text will not be bold. *But this will be.* And this again without bold.', '<p>This text will not be bold. <strong>But this will be.</strong> And this again without bold.</p>'],
             ['*Everyone _must_ attend the meeting at 5 today.*', '<p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p>'],
 #           ['_Everyone *must* attend the meeting at 5 today._', '<p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p>'],
+            ['This is an example link: http://example.com/.', '<p>This is an example link: <a href="http://example.com/">http://example.com/</a>.</p>'],
+            ['This is an [example link|http://example.com/].', '<p>This is an <a href="http://example.com/">example link</a>.</p>'],
+            ['This is an [example link|http://example.com/]. And this is an [example link|http://example.com/].', '<p>This is an <a href="http://example.com/">example link</a>. And this is an <a href="http://example.com/">example link</a>.</p>'],
         ];
     }
 
