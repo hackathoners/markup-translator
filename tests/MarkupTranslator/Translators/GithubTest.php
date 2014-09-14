@@ -4,20 +4,6 @@ namespace MarkupTranslator\Translators;
 
 class GithubTest extends \PHPUnit_Framework_TestCase
 {
-    private function cleanXML($text) {
-        $replace = [
-            '<?xml version="1.0" encoding="UTF-8"?>' => '',
-            "\n" => '',
-            '<body>' => '',
-            '</body>' => '',
-        ];
-        return str_replace(array_keys($replace), $replace, $text);
-    }
-
-    private function decorateWithRootNode($xmlString) {
-        return '<root>' . $xmlString . '</root>';
-    }
-
     public function translateProvider()
     {
         // https://help.github.com/articles/markdown-basics
@@ -70,7 +56,7 @@ class GithubTest extends \PHPUnit_Framework_TestCase
         $translator = new Github();
         $this->assertEquals(
             $expected,
-            $this->cleanXml($translator->translate($text))
+            cleanXml($translator->translate($text))
         );
     }
 
@@ -92,7 +78,7 @@ class GithubTest extends \PHPUnit_Framework_TestCase
         $translator = new Github();
         $this->assertEquals(
             $expected,
-            $translator->xmlToText($this->decorateWithRootNode($xml))
+            $translator->xmlToText(decorateWithRootNode($xml))
         );
     }
 
