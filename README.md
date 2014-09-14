@@ -9,6 +9,10 @@ Project Kanban Board
 ====================
 It's public! And you can find [our board on Trello](https://trello.com/b/8sNZuLlT/phpackaton)
 
+Demo
+====
+To try demo of our application just go to [our example repository](https://github.com/hackathoners/example) and follow the instructions in `README.md`.
+
 Useful links
 ============
 * [About Markdown](http://daringfireball.net/projects/markdown/),
