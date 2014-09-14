@@ -92,9 +92,9 @@ class Jira extends Base
         $formattedTextEnd = $this->lookAhead(mb_substr($text, $formattedTextBegin + $markupLength), $formattingMarkup);
         $afterFormattedText = mb_substr(mb_substr($text, $formattedTextBegin + $markupLength), $formattedTextEnd + $markupLength);
         $formattedText = mb_substr($text, $formattedTextBegin + $markupLength, $formattedTextEnd);
-
+        
         if( $beforeFormattedText !== '' ) {
-            $this->processInline($beforeFormattedText);
+            $this->text($beforeFormattedText);
         }
 
         $this->wrapInNode($nodeTag, function() use ($formattedText) {
@@ -102,7 +102,7 @@ class Jira extends Base
         });
 
         if( $afterFormattedText !== '' ) {
-            $this->processInline($afterFormattedText);
+            $this->text($afterFormattedText);
         }
 
         return '';
@@ -118,12 +118,12 @@ class Jira extends Base
     protected function processInline($text)
     {
         while($text) {
-            if( $this->lookAhead($text, self::EMPHASIZED_START_END) !== false ) {
-                return $this->processEmphasized($text);
-            }
-
             if( $this->lookAhead($text, self::STRONG_START_END) !== false ) {
                 return $this->processStrong($text);
+            }
+
+            if( $this->lookAhead($text, self::EMPHASIZED_START_END) !== false ) {
+                return $this->processEmphasized($text);
             }
 
             $text = $this->processRestOfLine($text);

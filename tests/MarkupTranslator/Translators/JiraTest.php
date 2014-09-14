@@ -29,6 +29,8 @@ class JiraTest extends TestsBase
             ['*This text will be bold*', '<p><strong>This text will be bold</strong></p>'],
             ['This text will not be bold. *But this will be.*', '<p>This text will not be bold. <strong>But this will be.</strong></p>'],
             ['This text will not be bold. *But this will be.* And this again without bold.', '<p>This text will not be bold. <strong>But this will be.</strong> And this again without bold.</p>'],
+            ['*Everyone _must_ attend the meeting at 5 today.*', '<p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p>'],
+#           ['_Everyone *must* attend the meeting at 5 today._', '<p><strong>Everyone <em>must</em> attend the meeting at 5 today.</strong></p>'],
         ];
     }
 
