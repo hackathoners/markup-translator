@@ -21,7 +21,8 @@ class Github extends Base
         'inStrong' => false,
     ];
 
-    protected function getMarkupName() {
+    protected function getMarkupName()
+    {
         return 'GitHub Markdown';
     }
 
@@ -209,10 +210,11 @@ class Github extends Base
     }
 
     /**
-     * @param \XMLReader $xml an XML document to be transformed to GitHub Markdown
+     * @param  \XMLReader $xml an XML document to be transformed to GitHub Markdown
      * @return String
      */
-    protected function processXml($xml) {
+    protected function processXml($xml)
+    {
         $output = '';
 
         /**
@@ -238,65 +240,52 @@ class Github extends Base
             self::NODE_STRONG => '**',
         ];
 
-        while($xml->read())
-        {
+        while ($xml->read()) {
             // if it's a beginning of new paragraph just continue
-            if($xml->nodeType === \XMLReader::ELEMENT && $xml->name === self::NODE_PARAGRAPH)
-            {
+            if ($xml->nodeType === \XMLReader::ELEMENT && $xml->name === self::NODE_PARAGRAPH) {
                 continue;
             }
 
             // if it's an ending of a paragraph add newlines
-            if($xml->nodeType === \XMLReader::END_ELEMENT && $xml->name === self::NODE_PARAGRAPH)
-            {
+            if ($xml->nodeType === \XMLReader::END_ELEMENT && $xml->name === self::NODE_PARAGRAPH) {
                 $output .= "\n\n";
             }
 
             // take care of wrapping nodes
-            if(in_array($xml->name, array_keys($wrappersMap)))
-            {
+            if (in_array($xml->name, array_keys($wrappersMap))) {
                 $output .= $wrappersMap[$xml->name];
             }
 
             // take care of nodes which just append things to their text
-            if(in_array($xml->name, array_keys($appendersMap)) && $xml->nodeType !== \XMLReader::END_ELEMENT)
-            {
+            if (in_array($xml->name, array_keys($appendersMap)) && $xml->nodeType !== \XMLReader::END_ELEMENT) {
                 $output .= $appendersMap[$xml->name];
             }
 
             // manipulate blockqoutes' state
-            if($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType !== \XMLReader::END_ELEMENT)
-            {
+            if ($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType !== \XMLReader::END_ELEMENT) {
                 $this->stateMachine['inBlockQuote'] = true;
             }
 
-            if($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType === \XMLReader::END_ELEMENT)
-            {
+            if ($xml->name === self::NODE_BLOCKQUOTE && $xml->nodeType === \XMLReader::END_ELEMENT) {
                 $this->stateMachine['inBlockQuote'] = false;
             }
 
             // links are partly "appenders" but here we need to finish rest of the magic ;)
-            if($xml->name === self::NODE_A && $xml->nodeType === \XMLReader::END_ELEMENT)
-            {
+            if ($xml->name === self::NODE_A && $xml->nodeType === \XMLReader::END_ELEMENT) {
                 $href = $xml->getAttribute('href');
                 $title = $xml->getAttribute('title');
 
-                if(empty($title))
-                {
+                if (empty($title)) {
                     $output .= '](' . $href . ')';
-                }
-                else
-                {
+                } else {
                     $output .= '](' . $href . ' "' . $title . '")';
                 }
             }
 
             // just add the text
-            if($xml->nodeType === \XMLReader::TEXT)
-            {
+            if ($xml->nodeType === \XMLReader::TEXT) {
                 // but be careful of blackqoute magic :p
-                if($this->stateMachine['inBlockQuote'])
-                {
+                if ($this->stateMachine['inBlockQuote']) {
                     $output .= '> ';
                 }
 

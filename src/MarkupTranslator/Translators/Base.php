@@ -91,7 +91,7 @@ abstract class Base extends \XMLWriter
 
         $nodeType = $nodeType[$level];
 
-        return $this->wrapInNode($nodeType, function() use ($text) {
+        return $this->wrapInNode($nodeType, function () use ($text) {
             return $this->processInline($text);
         });
     }
@@ -116,7 +116,8 @@ abstract class Base extends \XMLWriter
         });
     }
 
-    protected function processRestOfLine($text) {
+    protected function processRestOfLine($text)
+    {
         $end = $this->lookAhead($text, "\n");
         if ($end === false) {
             $end = mb_strlen($text);
@@ -133,11 +134,11 @@ abstract class Base extends \XMLWriter
         return $text;
     }
 
-    public function xmlToText($source) {
+    public function xmlToText($source)
+    {
         $source = trim($source);
 
-        if(empty($source))
-        {
+        if (empty($source)) {
             throw new \Exception('Empty source');
         }
 

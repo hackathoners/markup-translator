@@ -14,7 +14,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($testCase, Translator::translate($testCase, 'github', 'github'));
     }
 
-
     /**
      * @covers MarkupTranslator\Translator::getMarkups
      */
@@ -24,4 +23,3 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
 }
-
