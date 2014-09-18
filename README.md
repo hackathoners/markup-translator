@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/hackathoners/markup-translator.png?label=ready&title=Ready)](https://waffle.io/hackathoners/markup-translator)
 markup-translator [![Build Status](https://travis-ci.org/hackathoners/markup-translator.svg?branch=master)](https://travis-ci.org/hackathoners/markup-translator)
 =================
 
