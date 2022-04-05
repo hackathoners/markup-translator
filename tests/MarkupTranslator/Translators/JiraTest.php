@@ -2,7 +2,7 @@
 
 namespace MarkupTranslator\Translators;
 
-class JiraTest extends \PHPUnit_Framework_TestCase
+class JiraTest extends \PHPUnit\Framework\TestCase
 {
     public function translateProvider()
     {
