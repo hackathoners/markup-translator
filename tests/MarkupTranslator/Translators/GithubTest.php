@@ -2,7 +2,7 @@
 
 namespace MarkupTranslator\Translators;
 
-class GithubTest extends \PHPUnit_Framework_TestCase
+class GithubTest extends \PHPUnit\Framework\TestCase
 {
     public function translateProvider()
     {
@@ -66,7 +66,7 @@ class GithubTest extends \PHPUnit_Framework_TestCase
     public function testXmlToText_throws_exception()
     {
         $translator = new Github();
-        $this->setExpectedException('Exception', 'Empty source');
+        $this->expectException('Exception', 'Empty source');
         $translator->xmlToText('            ');
     }
 

@@ -2,7 +2,7 @@
 
 namespace MarkupTranslator;
 
-class TranslatorTest extends \PHPUnit_Framework_TestCase
+class TranslatorTest extends \PHPUnit\Framework\TestCase
 {
 
     /**
